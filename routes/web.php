@@ -25,6 +25,12 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/run-migrate', function () {
+    Artisan::call('migrate', ['--force' => true]);
+    return "Database berhasil dimigrasi!";
+});
 
 Route::get('/', fn(): Factory|View => view('welcome'))->name('home');
 
