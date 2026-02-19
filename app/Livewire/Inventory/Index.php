@@ -69,7 +69,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                 TextColumn::make('stock_value')
                     ->label('Stock Value')
                     ->getStateUsing(fn($record): float => $record->quantity * $record->item->price)
-                    ->money('USD')
+                    ->money('IDR')
                     ->color('success')
                     ->weight('bold')
                     ->alignCenter(),
@@ -160,7 +160,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                     ->icon('heroicon-o-qr-code'),
                                 TextEntry::make('item.price')
                                     ->label('Unit Price')
-                                    ->money('USD')
+                                    ->money('IDR')
                                     ->color('primary')
                                     ->icon('heroicon-o-currency-dollar'),
                                 TextEntry::make('item.status')
@@ -188,7 +188,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                     ->size('lg')
                                     ->weight('bold')
                                     ->getStateUsing(fn($record): float => $record->quantity * $record->item->price)
-                                    ->money('USD')
+                                    ->money('IDR')
                                     ->color('success')
                                     ->icon('heroicon-o-banknotes'),
                                 TextEntry::make('created_at')

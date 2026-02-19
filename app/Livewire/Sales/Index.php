@@ -61,7 +61,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     }),
                 TextColumn::make('total')
                     ->label('Total')
-                    ->money('USD')
+                    ->money('IDR')
                     ->sortable()
                     ->weight('bold')
                     ->color('success')
@@ -101,7 +101,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                     ->schema([
                                         TextEntry::make('total')
                                             ->label('Total')
-                                            ->money('USD')
+                                            ->money('IDR')
                                             ->icon('heroicon-o-currency-dollar')
                                             ->color('success')
                                             ->weight('bold')
@@ -112,7 +112,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                     ->schema([
                                         TextEntry::make('paid_amount')
                                             ->label('Paid')
-                                            ->money('USD')
+                                            ->money('IDR')
                                             ->icon('heroicon-o-banknotes')
                                             ->color('info')
                                             ->weight('bold')
@@ -124,7 +124,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                         TextEntry::make('balance')
                                             ->label('Balance')
                                             ->state(fn(Sale $record): float => (float) $record->total - (float) $record->paid_amount)
-                                            ->money('USD')
+                                            ->money('IDR')
                                             ->icon('heroicon-o-calculator')
                                             ->color(fn(Sale $record): string => ((float) $record->total - (float) $record->paid_amount) > 0 ? 'danger' : 'success')
                                             ->weight('bold')
@@ -135,7 +135,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                     ->schema([
                                         TextEntry::make('discount')
                                             ->label('Discount')
-                                            ->money('USD')
+                                            ->money('IDR')
                                             ->icon('heroicon-o-tag')
                                             ->color('warning')
                                             ->weight('bold')
@@ -221,12 +221,12 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
 
                                         TextEntry::make('price')
                                             ->label('Unit Price')
-                                            ->money('USD'),
+                                            ->money('IDR'),
 
                                         TextEntry::make('subtotal')
                                             ->label('Subtotal')
                                             ->state(fn($record): float => (float) $record->quantity * (float) $record->price)
-                                            ->money('USD')
+                                            ->money('IDR')
                                             ->color('success')
                                             ->weight('bold'),
                                     ])
