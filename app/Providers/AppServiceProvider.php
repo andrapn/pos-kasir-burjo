@@ -11,8 +11,7 @@ use App\Observers\SaleObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App; // FIX: Wajib import
+use Illuminate\Http\Request; // FIX: Wajib import
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
@@ -40,18 +39,20 @@ final class AppServiceProvider extends ServiceProvider
 
     private function configureCommands(): void
     {
-        DB::prohibitDestructiveCommands(App::isProduction());
+        DB::prohibitDestructiveCommands(
+            $this->app->isProduction(),
+        );
     }
 
     private function configureModels(): void
     {
-        Model::shouldBeStrict( ! App::isProduction());
-        Model::preventLazyLoading( ! App::isProduction());
+        Model::shouldBeStrict( ! $this->app->isProduction());
+        Model::preventLazyLoading( ! $this->app->isProduction());
     }
 
     private function configureUrl(): void
     {
-        URL::forceHttps(App::isProduction());
+        URL::forceHttps($this->app->isProduction());
     }
 
     private function configureVite(): void
@@ -62,8 +63,12 @@ final class AppServiceProvider extends ServiceProvider
     private function configurePasswordValidation(): void
     {
         Password::defaults(
-            fn() => App::isProduction()
-                ? Password::min(8)->uncompromised()->letters()->mixedCase()->numbers()
+            fn() => $this->app->isProduction()
+                ? Password::min(8)
+                    ->uncompromised()
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
                 : null,
         );
     }
@@ -76,12 +81,27 @@ final class AppServiceProvider extends ServiceProvider
 
     private function configureRateLimiting(): void
     {
-        RateLimiter::for('global', fn(Request $request) => Limit::perMinute(60)->by($request->ip()));
-        RateLimiter::for('api', fn(Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
-        RateLimiter::for('auth', fn(Request $request) => Limit::perMinute(5)->by($request->ip()));
-        RateLimiter::for('login', fn(Request $request) => Limit::perMinute(5)
+        RateLimiter::for(
+            'global',
+            fn(Request $request) => Limit::perMinute(60)->by($request->ip()),
+        );
+
+        RateLimiter::for(
+            'api',
+            fn(Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()),
+        );
+
+        RateLimiter::for(
+            'auth',
+            fn(Request $request) => Limit::perMinute(5)->by($request->ip()),
+        );
+
+        RateLimiter::for(
+            'login',
+            fn(Request $request) => Limit::perMinute(5)
                 ->by($request->input('email') . '|' . $request->ip())
-                ->response(fn() => response()->json(['message' => 'Too many login attempts.'], 429)));
+                ->response(fn() => response()->json(['message' => 'Too many login attempts.'], 429)),
+        );
     }
 
     private function loadObserver(): void
