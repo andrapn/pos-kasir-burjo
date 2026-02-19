@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Number;
 use Illuminate\Validation\Rules\Password;
 
 final class AppServiceProvider extends ServiceProvider
@@ -32,6 +33,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->configureCarbonImmutable();
         $this->configureRateLimiting();
         $this->loadObserver();
+        Number::useLocale('id');
     }
 
     private function configureCommands(): void

@@ -67,7 +67,10 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
+    'locale' => 'id',
+    'fallback_locale' => 'en',
+    'faker_locale' => 'id_ID',
 
     /*
     |--------------------------------------------------------------------------
