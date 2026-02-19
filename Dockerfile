@@ -5,10 +5,12 @@ WORKDIR /app
 # Install System Dependencies untuk PHP & Node.js
 RUN apt-get update && apt-get install -y \
     libpng-dev libonig-dev libxml2-dev libzip-dev libpq-dev libicu-dev \
+    libjpeg62-turbo-dev libfreetype6-dev \
     zip unzip git curl gnupg \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
-    && docker-php-ext-install pdo_pgsql pgsql intl zip
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_pgsql pgsql intl zip bcmath gd mbstring
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -16,10 +18,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy semua file project
 COPY . .
 
-# 1. Jalankan Composer Install agar folder 'vendor' tersedia untuk Vite
+# Jalankan Instalasi
 RUN composer install --no-dev --optimize-autoloader
-
-# 2. Jalankan NPM Install & Build
 RUN npm install && npm run build
 
 # Stage 2: Production Image
@@ -27,7 +27,9 @@ FROM php:8.4-apache
 
 # Install Runtime Dependencies
 RUN apt-get update && apt-get install -y \
-    libpq-dev libicu-dev libzip-dev libpng-dev \
+    libpq-dev libicu-dev libzip-dev libpng-dev libonig-dev \
+    libjpeg62-turbo-dev libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_pgsql pgsql intl zip bcmath gd mbstring
 
 # Enable Apache Mod Rewrite
@@ -35,10 +37,10 @@ RUN a2enmod rewrite
 
 WORKDIR /var/www/html
 
-# Copy semua file dari stage builder
+# Copy file dari builder
 COPY --from=builder /app .
 
-# Set Permissions untuk Laravel
+# Set Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Update Apache Config
