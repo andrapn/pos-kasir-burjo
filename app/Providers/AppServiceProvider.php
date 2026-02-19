@@ -37,11 +37,9 @@ final class AppServiceProvider extends ServiceProvider
         Number::useLocale('id');
     }
 
-    private function configureCommands(): void
+private function configureCommands(): void
     {
-        DB::prohibitDestructiveCommands(
-            App::isProduction(),
-        );
+        DB::prohibitDestructiveCommands(App::isProduction());
     }
 
     private function configureModels(): void
@@ -81,27 +79,12 @@ final class AppServiceProvider extends ServiceProvider
 
     private function configureRateLimiting(): void
     {
-        RateLimiter::for(
-            'global',
-            fn(Request $request) => Limit::perMinute(60)->by($request->ip()),
-        );
-
-        RateLimiter::for(
-            'api',
-            fn(Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()),
-        );
-
-        RateLimiter::for(
-            'auth',
-            fn(Request $request) => Limit::perMinute(5)->by($request->ip()),
-        );
-
-        RateLimiter::for(
-            'login',
-            fn(Request $request) => Limit::perMinute(5)
+        RateLimiter::for('global', fn(Request $request) => Limit::perMinute(60)->by($request->ip()));
+        RateLimiter::for('api', fn(Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
+        RateLimiter::for('auth', fn(Request $request) => Limit::perMinute(5)->by($request->ip()));
+        RateLimiter::for('login', fn(Request $request) => Limit::perMinute(5)
                 ->by($request->input('email') . '|' . $request->ip())
-                ->response(fn() => response()->json(['message' => 'Too many login attempts.'], 429)),
-        );
+                ->response(fn() => response()->json(['message' => 'Too many login attempts.'], 429)));
     }
 
     private function loadObserver(): void
