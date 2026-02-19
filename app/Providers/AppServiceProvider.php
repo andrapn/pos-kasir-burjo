@@ -12,6 +12,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
@@ -39,19 +40,19 @@ final class AppServiceProvider extends ServiceProvider
     private function configureCommands(): void
     {
         DB::prohibitDestructiveCommands(
-            $this->app->isProduction(),
+            App::isProduction(),
         );
     }
 
     private function configureModels(): void
     {
-        Model::shouldBeStrict( ! $this->app->isProduction());
-        Model::preventLazyLoading( ! $this->app->isProduction());
+        Model::shouldBeStrict( ! App::isProduction());
+        Model::preventLazyLoading( ! App::isProduction());
     }
 
     private function configureUrl(): void
     {
-        URL::forceHttps($this->app->isProduction());
+        URL::forceHttps(App::isProduction());
     }
 
     private function configureVite(): void
@@ -62,7 +63,7 @@ final class AppServiceProvider extends ServiceProvider
     private function configurePasswordValidation(): void
     {
         Password::defaults(
-            fn() => $this->app->isProduction()
+            fn() => App::isProduction()
                 ? Password::min(8)
                     ->uncompromised()
                     ->letters()
