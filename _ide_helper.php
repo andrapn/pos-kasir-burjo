@@ -22980,6 +22980,15 @@ namespace Illuminate\Support\Facades {
             return $instance->renderTranslation();
         }
 
+        /**
+         * @see \Flux\FluxServiceProvider::bootMacros()
+         * @static
+         */
+        public static function getCurrentComponentData()
+        {
+            return \Illuminate\View\Factory::getCurrentComponentData();
+        }
+
             }
     /**
      * @see \Illuminate\Foundation\Vite
@@ -24128,6 +24137,203 @@ namespace Laravel\Socialite\Facades {
             }
     }
 
+namespace Flux {
+    /**
+     * @see \Flux\FluxManager
+     */
+    class Flux {
+        /**
+         * @static
+         */
+        public static function boot()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->boot();
+        }
+
+        /**
+         * @static
+         */
+        public static function ensurePro()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->ensurePro();
+        }
+
+        /**
+         * @static
+         */
+        public static function pro()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->pro();
+        }
+
+        /**
+         * @static
+         */
+        public static function markAssetsRendered()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->markAssetsRendered();
+        }
+
+        /**
+         * @static
+         */
+        public static function scripts($options = [])
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->scripts($options);
+        }
+
+        /**
+         * @static
+         */
+        public static function fluxAppearance($options = [])
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->fluxAppearance($options);
+        }
+
+        /**
+         * @static
+         */
+        public static function editorStyles()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->editorStyles();
+        }
+
+        /**
+         * @static
+         */
+        public static function editorScripts()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->editorScripts();
+        }
+
+        /**
+         * @static
+         */
+        public static function classes($styles = null)
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->classes($styles);
+        }
+
+        /**
+         * @static
+         */
+        public static function disallowWireModel($attributes, $componentName)
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->disallowWireModel($attributes, $componentName);
+        }
+
+        /**
+         * @static
+         */
+        public static function splitAttributes($attributes, $by = [], $strict = false)
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->splitAttributes($attributes, $by, $strict);
+        }
+
+        /**
+         * @static
+         */
+        public static function restorePassThroughProps($attributes, $passThroughProps)
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->restorePassThroughProps($attributes, $passThroughProps);
+        }
+
+        /**
+         * @static
+         */
+        public static function forwardedAttributes($attributes, $propKeys)
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->forwardedAttributes($attributes, $propKeys);
+        }
+
+        /**
+         * @static
+         */
+        public static function attributesAfter($prefix, $attributes, $default = [])
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->attributesAfter($prefix, $attributes, $default);
+        }
+
+        /**
+         * @static
+         */
+        public static function applyInset($inset, $top, $right, $bottom, $left)
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->applyInset($inset, $top, $right, $bottom, $left);
+        }
+
+        /**
+         * @static
+         */
+        public static function componentExists($name)
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->componentExists($name);
+        }
+
+        /**
+         * @static
+         */
+        public static function bootComponents()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->bootComponents();
+        }
+
+        /**
+         * @static
+         */
+        public static function bootModal()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->bootModal();
+        }
+
+        /**
+         * @static
+         */
+        public static function modal($name)
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->modal($name);
+        }
+
+        /**
+         * @static
+         */
+        public static function modals()
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->modals();
+        }
+
+        /**
+         * @static
+         */
+        public static function toast($text, $heading = null, $duration = 5000, $variant = null, $position = null)
+        {
+            /** @var \Flux\FluxManager $instance */
+            return $instance->toast($text, $heading, $duration, $variant, $position);
+        }
+
+            }
+    }
+
 namespace Livewire {
     /**
      * @see \Livewire\LivewireManager
@@ -24553,6 +24759,20 @@ namespace Livewire {
             //Method inherited from \Livewire\LivewireManager 
             /** @var \Livewire\Volt\LivewireManager $instance */
             return $instance->originalMethod();
+        }
+
+            }
+    /**
+     */
+    class Component {
+        /**
+         * @see \Flux\FluxManager::bootModal()
+         * @param mixed $name
+         * @static
+         */
+        public static function modal($name)
+        {
+            return \Livewire\Component::modal($name);
         }
 
             }
@@ -28116,6 +28336,17 @@ namespace Illuminate\View {
         }
 
         /**
+         * @see \Flux\FluxServiceProvider::bootMacros()
+         * @param mixed $key
+         * @param mixed $default
+         * @static
+         */
+        public static function pluck($key, $default = null)
+        {
+            return \Illuminate\View\ComponentAttributeBag::pluck($key, $default);
+        }
+
+        /**
          * @see \Livewire\Features\SupportBladeAttributes\SupportBladeAttributes::provide()
          * @param mixed $name
          * @static
@@ -28123,6 +28354,19 @@ namespace Illuminate\View {
         public static function wire($name)
         {
             return \Illuminate\View\ComponentAttributeBag::wire($name);
+        }
+
+            }
+    /**
+     */
+    class Factory {
+        /**
+         * @see \Flux\FluxServiceProvider::bootMacros()
+         * @static
+         */
+        public static function getCurrentComponentData()
+        {
+            return \Illuminate\View\Factory::getCurrentComponentData();
         }
 
             }
@@ -28230,6 +28474,129 @@ namespace Illuminate\Testing {
             return \Illuminate\Testing\TestResponse::assertDontSeeVolt($component);
         }
 
+            }
+    }
+
+namespace App\Livewire\Dashboard {
+    /**
+     */
+    class Index extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Items {
+    /**
+     */
+    class Index extends \Livewire\Component {
+            }
+    /**
+     */
+    class Edit extends \Livewire\Component {
+            }
+    /**
+     */
+    class Create extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Inventory {
+    /**
+     */
+    class Index extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Customer {
+    /**
+     */
+    class Index extends \Livewire\Component {
+            }
+    /**
+     */
+    class Create extends \Livewire\Component {
+            }
+    /**
+     */
+    class Edit extends \Livewire\Component {
+            }
+    /**
+     */
+    class Show extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Sales {
+    /**
+     */
+    class Index extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Pos {
+    /**
+     */
+    class Index extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Management {
+    /**
+     */
+    class ListUsers extends \Livewire\Component {
+            }
+    /**
+     */
+    class CreateUser extends \Livewire\Component {
+            }
+    /**
+     */
+    class ListPaymentMethods extends \Livewire\Component {
+            }
+    /**
+     */
+    class Roles extends \Livewire\Component {
+            }
+    /**
+     */
+    class CreateRole extends \Livewire\Component {
+            }
+    /**
+     */
+    class EditRole extends \Livewire\Component {
+            }
+    /**
+     */
+    class AuthenticationLogs extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire {
+    /**
+     */
+    class BackupManager extends \Livewire\Component {
+            }
+    /**
+     */
+    class NotificationsList extends \Livewire\Component {
+            }
+    }
+
+namespace App\Livewire\Settings {
+    /**
+     */
+    class Profile extends \Livewire\Component {
+            }
+    /**
+     */
+    class Password extends \Livewire\Component {
+            }
+    /**
+     */
+    class Appearance extends \Livewire\Component {
+            }
+    /**
+     */
+    class TwoFactor extends \Livewire\Component {
             }
     }
 
@@ -33682,6 +34049,7 @@ namespace  {
     class EloquentSerialize extends \AnourValar\EloquentSerialize\Facades\EloquentSerializeFacade {}
     class Debugbar extends \Barryvdh\Debugbar\Facades\Debugbar {}
     class Socialite extends \Laravel\Socialite\Facades\Socialite {}
+    class Flux extends \Flux\Flux {}
     class Livewire extends \Livewire\Livewire {}
     class LogViewer extends \Opcodes\LogViewer\Facades\LogViewer {}
     class Signal extends \Spatie\SignalAwareCommand\Facades\Signal {}
