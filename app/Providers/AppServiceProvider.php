@@ -12,20 +12,22 @@ use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\App; // FIX: Wajib import
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
-use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Number; // FIX: Wajib import buat IDR
 
 final class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        Number::useLocale('id'); // Setup IDR
+
         $this->configureCommands();
         $this->configureModels();
         $this->configureUrl();
@@ -34,7 +36,6 @@ final class AppServiceProvider extends ServiceProvider
         $this->configureCarbonImmutable();
         $this->configureRateLimiting();
         $this->loadObserver();
-        Number::useLocale('id');
     }
 
     private function configureCommands(): void
@@ -62,11 +63,7 @@ final class AppServiceProvider extends ServiceProvider
     {
         Password::defaults(
             fn() => App::isProduction()
-                ? Password::min(8)
-                    ->uncompromised()
-                    ->letters()
-                    ->mixedCase()
-                    ->numbers()
+                ? Password::min(8)->uncompromised()->letters()->mixedCase()->numbers()
                 : null,
         );
     }
@@ -83,8 +80,8 @@ final class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', fn(Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));
         RateLimiter::for('auth', fn(Request $request) => Limit::perMinute(5)->by($request->ip()));
         RateLimiter::for('login', fn(Request $request) => Limit::perMinute(5)
-            ->by($request->input('email') . '|' . $request->ip())
-            ->response(fn() => response()->json(['message' => 'Too many login attempts.'], 429)));
+                ->by($request->input('email') . '|' . $request->ip())
+                ->response(fn() => response()->json(['message' => 'Too many login attempts.'], 429)));
     }
 
     private function loadObserver(): void
