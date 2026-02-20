@@ -38,18 +38,18 @@
         <div class="flex-1 overflow-y-auto p-4">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 @forelse ($this->filteredItems as $item)
-                    <button
+<button
                         wire:click="addToCart({{ $item['id'] }})"
                         wire:loading.attr="disabled"
                         wire:target="addToCart({{ $item['id'] }})"
-                        class="group relative bg-white dark:bg-zinc-800 rounded-xl p-3 text-left
+                        class="group relative bg-white dark:bg-zinc-800 rounded-xl p-4 text-left
                                border-2 border-transparent hover:border-indigo-500 dark:hover:border-indigo-400
-                               transition-all duration-150 hover:shadow-lg active:scale-[0.98]
+                               transition-all duration-150 hover:shadow-md active:scale-[0.98]
                                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
-                               dark:focus:ring-offset-zinc-900"
+                               dark:focus:ring-offset-zinc-900 flex flex-col justify-between min-h-[90px]"
                     >
-                        {{-- Stock Indicator --}}
-                        <div class="absolute top-2 right-2">
+                        {{-- Stock Indicator (Ping Animation) --}}
+                        <div class="absolute top-3 right-3">
                             @if($item['stock'] <= 5)
                                 <span class="flex size-2">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -58,31 +58,22 @@
                             @endif
                         </div>
 
-                        {{-- Product Image --}}
-                        <div class="aspect-square bg-gradient-to-br from-zinc-100 to-zinc-200
-                                    dark:from-zinc-700 dark:to-zinc-600 rounded-lg mb-3
-                                    flex items-center justify-center overflow-hidden
-                                    group-hover:from-indigo-50 group-hover:to-indigo-100
-                                    dark:group-hover:from-indigo-900/30 dark:group-hover:to-indigo-800/30
-                                    transition-colors">
-                            <flux:icon name="cube" class="size-8 text-zinc-400 group-hover:text-indigo-500 transition-colors" />
-                        </div>
-
-                        {{-- Product Info --}}
-                        <div class="space-y-1">
-                            <h3 class="font-medium text-sm text-zinc-900 dark:text-white line-clamp-2 leading-tight">
+                        {{-- Product Info (Tanpa Box Gambar) --}}
+                        <div class="w-full">
+                            <h3 class="font-medium text-sm text-zinc-900 dark:text-white line-clamp-2 leading-tight pr-4">
                                 {{ $item['name'] }}
                             </h3>
-                            <p class="text-[10px] text-zinc-400 font-mono">{{ $item['sku'] }}</p>
-                            <div class="flex items-center justify-between pt-1">
+                            <p class="text-[10px] text-zinc-400 font-mono mt-0.5">{{ $item['sku'] }}</p>
+                            
+                            <div class="flex items-center justify-between mt-4">
                                 <span class="text-base font-bold text-indigo-600 dark:text-indigo-400">
                                     {{ \Illuminate\Support\Number::currency($item['price'], 'IDR') }}
                                 </span>
-                                <span class="text-[10px] px-1.5 py-0.5 rounded
+                                <span class="text-[10px] px-1.5 py-0.5 rounded font-medium
                                     {{ $item['stock'] > 10 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400' :
                                        ($item['stock'] > 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400' :
                                        'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400') }}">
-                                    {{ $item['stock'] }}
+                                    Stock: {{ $item['stock'] }}
                                 </span>
                             </div>
                         </div>
