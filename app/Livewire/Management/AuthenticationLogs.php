@@ -20,6 +20,8 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,11 +32,13 @@ use Livewire\Component;
 use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 use Stevebauman\Location\Facades\Location;
 
-final class AuthenticationLogs extends Component implements HasActions, HasSchemas, HasTable
+// Ubah baris ini:
+final class AuthenticationLogs extends Component implements HasActions, HasSchemas, HasTable, HasForms
 {
     use InteractsWithActions;
     use InteractsWithSchemas;
     use InteractsWithTable;
+    use InteractsWithForms; // Tambahkan ini
 
     public function table(Table $table): Table
     {

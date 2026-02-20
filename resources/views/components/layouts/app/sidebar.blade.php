@@ -169,17 +169,6 @@
                 >
                     {{ __('Dashboard') }}
                 </flux:navlist.item>
-
-                @can('sales.view')
-                    <flux:navlist.item
-                        wire:navigate
-                        icon="presentation-chart-line"
-                        :href="route('sales.index')"
-                        :current="request()->routeIs('sales.*')"
-                    >
-                        {{ __('Analytics') }}
-                    </flux:navlist.item>
-                @endcan
             </flux:navlist.group>
         @endcan
 
