@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Livewire;
 use App\Livewire\BackupManager;
 use App\Livewire\Customer\Show;
+use App\Livewire\Inventory\VariantGroups;
 use App\Livewire\Items\Create;
 use App\Livewire\Items\Edit;
 use App\Livewire\Items\Index;
@@ -24,7 +25,6 @@ use App\Livewire\Settings\TwoFactor;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
-use App\Livewire\Inventory\VariantGroups;
 
 Route::get('/inventory/variants', VariantGroups::class)->name('variants.index');
 

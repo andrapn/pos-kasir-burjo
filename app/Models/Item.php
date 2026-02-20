@@ -71,6 +71,11 @@ final class Item extends Model
         return $this->hasMany(related: SalesItem::class, foreignKey: 'item_id');
     }
 
+    public function variantGroups()
+    {
+        return $this->belongsToMany(VariantGroup::class, 'item_variant_group');
+    }
+
     protected function casts(): array
     {
         return [
@@ -89,9 +94,5 @@ final class Item extends Model
     protected function inactive(Builder $query): void
     {
         $query->where('status', ItemStatus::INACTIVE->value);
-    }
-    public function variantGroups()
-    {
-        return $this->belongsToMany(VariantGroup::class, 'item_variant_group');
     }
 }

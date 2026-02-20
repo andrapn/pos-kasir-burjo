@@ -35,9 +35,13 @@ final class Index extends Component implements HasActions, HasSchemas
     public $paymentMethods;
 
     public bool $showVariantModal = false;
+
     public int $selectedItemIdForVariant = 0;
+
     public string $selectedItemNameForVariant = '';
+
     public array $itemVariants = [];
+
     public array $selectedOptions = []; // Menyimpan pilihan kasir
 
     public ?string $search = null;
@@ -137,24 +141,24 @@ final class Index extends Component implements HasActions, HasSchemas
 
     public function addToCart(int $itemId): void
     {
-        $item = \App\Models\Item::with(['variantGroups.options'])->find($itemId);
+        $item = Item::with(['variantGroups.options'])->find($itemId);
 
         if ($item && $item->variantGroups->count() > 0) {
             // FIX 500 ERROR: Kita ubah model relasi menjadi Array murni agar Livewire tidak tersedak
             $this->selectedItemIdForVariant = $item->id;
             $this->selectedItemNameForVariant = $item->name;
             $this->selectedOptions = []; // Reset pilihan kasir
-            
-            $this->itemVariants = $item->variantGroups->map(function($group) use ($item) {
+
+            $this->itemVariants = $item->variantGroups->map(function ($group) use ($item) {
                 return [
                     'group_id' => $group->id,
                     'group_name' => $group->name,
                     'track_stock' => $group->track_stock,
-                    'options' => $group->options->map(function($opt) use ($item, $group) {
+                    'options' => $group->options->map(function ($opt) use ($item, $group) {
                         // Jika grup ini mendeteksi stok, ambil stok dari tabel inventory
                         $stock = null;
                         if ($group->track_stock) {
-                            $inv = \App\Models\Inventory::where('item_id', $item->id)
+                            $inv = Inventory::where('item_id', $item->id)
                                 ->where('variant_option_id', $opt->id)->first();
                             $stock = $inv ? $inv->quantity : 0;
                         }
@@ -164,11 +168,12 @@ final class Index extends Component implements HasActions, HasSchemas
                             'name' => $opt->name,
                             'stock' => $stock,
                         ];
-                    })->toArray()
+                    })->toArray(),
                 ];
             })->toArray();
 
             $this->showVariantModal = true;
+
             return;
         }
 
@@ -181,27 +186,29 @@ final class Index extends Component implements HasActions, HasSchemas
         // Pastikan kasir memilih 1 opsi dari setiap grup (cth: wajib pilih Rasa & wajib pilih Suhu)
         if (count($this->selectedOptions) !== count($this->itemVariants)) {
             Notification::make()->title('Gagal!')->body('Harap pilih semua varian.')->warning()->send();
+
             return;
         }
 
-        $item = \App\Models\Item::find($this->selectedItemIdForVariant);
-        
+        $item = Item::find($this->selectedItemIdForVariant);
+
         $selectedOptionNames = [];
         $variantIds = [];
-        
+
         foreach ($this->itemVariants as $group) {
             $optId = $this->selectedOptions[$group['group_id']];
             $variantIds[] = $optId;
             $opt = collect($group['options'])->firstWhere('id', $optId);
             $selectedOptionNames[] = $opt['name'];
-            
+
             // Validasi limitasi stok
             if ($group['track_stock']) {
                 $cartKey = $item->id . '-' . implode('-', $variantIds);
                 $currentQty = $this->cart[$cartKey]['quantity'] ?? 0;
                 if ($currentQty >= $opt['stock']) {
-                     Notification::make()->title("Stok {$opt['name']} tidak cukup!")->danger()->send();
-                     return;
+                    Notification::make()->title("Stok {$opt['name']} tidak cukup!")->danger()->send();
+
+                    return;
                 }
             }
         }

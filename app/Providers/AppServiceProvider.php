@@ -22,7 +22,7 @@ use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
- // FIX: Wajib import buat IDR
+// FIX: Wajib import buat IDR
 
 final class AppServiceProvider extends ServiceProvider
 {
