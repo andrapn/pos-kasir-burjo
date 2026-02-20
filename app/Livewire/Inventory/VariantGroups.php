@@ -7,31 +7,28 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-
-// Surat Izin WAJIB agar modal Form tidak error
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Actions\Contracts\HasActions;
-
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
-
-// 👇 KITA HANYA IMPORT SATU ACTION MURNI INI, BUANG YANG LAIN 👇
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
-
+use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Repeater;
 use Livewire\Component;
 use Illuminate\Contracts\View\View;
 
-class VariantGroups extends Component implements HasForms, HasTable, HasActions
+class VariantGroups extends Component implements HasForms, HasTable
 {
     use InteractsWithForms;
     use InteractsWithTable;
-    use InteractsWithActions;
+
+    public ?array $data = [];
+    public $editingId = null;
+
+    public function mount()
+    {
+        $this->form->fill();
+    }
 
     public function table(Table $table): Table
     {
@@ -41,58 +38,98 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 TextColumn::make('name')
                     ->label('Nama Grup (Cth: Rasa)')
                     ->searchable(),
-                
                 IconColumn::make('track_stock')
                     ->label('Pakai Stok?')
                     ->boolean(),
-                
                 TextColumn::make('options_count')
                     ->label('Jumlah Pilihan')
                     ->counts('options'),
-                
                 TextColumn::make('options.name')
                     ->label('Daftar Opsi')
                     ->badge(),
-            ])
-            ->headerActions([
-                CreateAction::make()
-                    ->label('Tambah Master Varian')
-                    ->icon('heroicon-o-plus')
-                    ->form($this->getFormSchema()),
-            ])
-            ->actions([
-                EditAction::make()
-                    ->form($this->getFormSchema()),
-                DeleteAction::make(),
+                // KITA PAKAI KOLOM CUSTOM UNTUK TOMBOL
+                TextColumn::make('id')
+                    ->label('Aksi')
+                    ->view('livewire.inventory.table-actions')
             ]);
     }
 
-    protected function getFormSchema(): array
+    public function form(Form $form): Form
     {
-        return [
-            TextInput::make('name')
-                ->label('Judul Varian')
-                ->placeholder('Cth: Rasa Nutrisari, Level Pedas')
-                ->required(),
-            
-            Toggle::make('track_stock')
-                ->label('Aktifkan Manajemen Stok?')
-                ->helperText('Nyalakan jika varian ini memotong stok. Matikan jika hanya pelengkap.')
-                ->default(false),
-            
-            Repeater::make('options')
-                // ->relationship() DIHAPUS karena kita save manual di atas
-                ->label('Isi Pilihan Varian')
-                ->schema([
-                    TextInput::make('name')
-                        ->label('Nama Pilihan')
-                        ->placeholder('Cth: Semangka, Sedang, Panas')
-                        ->required(),
-                ])
-                ->columns(1)
-                ->addActionLabel('Tambah Pilihan')
-                ->required(),
-        ];
+        return $form
+            ->schema([
+                TextInput::make('name')
+                    ->label('Judul Varian')
+                    ->placeholder('Cth: Rasa Nutrisari, Level Pedas')
+                    ->required(),
+                Toggle::make('track_stock')
+                    ->label('Aktifkan Manajemen Stok?')
+                    ->default(false),
+                Repeater::make('options')
+                    ->label('Isi Pilihan Varian')
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Nama Pilihan')
+                            ->required(),
+                    ])
+                    ->columns(1)
+                    ->addActionLabel('Tambah Pilihan')
+            ])
+            ->statePath('data'); // Wajib ada untuk form custom
+    }
+
+    public function openCreate()
+    {
+        $this->form->fill();
+        $this->editingId = null;
+    }
+
+    public function openEdit($id)
+    {
+        $this->editingId = $id;
+        $group = VariantGroup::with('options')->find($id);
+        
+        if ($group) {
+            $this->form->fill([
+                'name' => $group->name,
+                'track_stock' => $group->track_stock,
+                'options' => $group->options->toArray(),
+            ]);
+        }
+    }
+
+    public function delete($id)
+    {
+        VariantGroup::find($id)?->delete();
+    }
+
+    public function save()
+    {
+        $data = $this->form->getState();
+
+        if ($this->editingId) {
+            $group = VariantGroup::find($this->editingId);
+            $group->update([
+                'name' => $data['name'],
+                'track_stock' => $data['track_stock'],
+            ]);
+            $group->options()->delete();
+            if (!empty($data['options'])) {
+                $group->options()->createMany($data['options']);
+            }
+        } else {
+            $group = VariantGroup::create([
+                'name' => $data['name'],
+                'track_stock' => $data['track_stock'],
+            ]);
+            if (!empty($data['options'])) {
+                $group->options()->createMany($data['options']);
+            }
+        }
+
+        $this->form->fill();
+        $this->editingId = null;
+        $this->dispatch('close-variant-modal'); // Memicu penutupan modal Flux
     }
 
     public function render(): View
