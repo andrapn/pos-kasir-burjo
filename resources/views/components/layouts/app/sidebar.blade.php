@@ -222,7 +222,17 @@
                         {{ __('Products') }}
                     </flux:navlist.item>
                 @endcan
-
+                @can('items.view')
+                    <flux:navlist.item
+                        wire:navigate
+                        icon="rectangle-group"
+                        :href="route('variants.index')"
+                        :current="request()->routeIs('variants.*')"
+                    >
+                        {{ __('Master Variants') }}
+                    </flux:navlist.item>
+                @endcan
+                </flux:navlist.item>
                 @can('inventory.view')
                     <flux:navlist.item
                         wire:navigate

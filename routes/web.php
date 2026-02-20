@@ -24,6 +24,9 @@ use App\Livewire\Settings\TwoFactor;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use App\Livewire\Inventory\VariantGroups;
+
+Route::get('/inventory/variants', VariantGroups::class)->name('variants.index');
 
 Route::get('/run-migrate', function () {
     Artisan::call('migrate', ['--force' => true]);
