@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Inventory;
 
 use App\Models\VariantGroup;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Livewire\Component;
 use Illuminate\Contracts\View\View;
+use Livewire\Component;
 
-class VariantGroups extends Component implements HasForms, HasTable
+final class VariantGroups extends Component implements HasForms, HasTable
 {
     use InteractsWithForms;
     use InteractsWithTable;
@@ -30,7 +32,7 @@ class VariantGroups extends Component implements HasForms, HasTable
                     ->label('Pakai Stok?')
                     ->boolean(),
             ]);
-            // Semua Action & Modal Form AKU HAPUS TOTAL di sini untuk ngetes.
+        // Semua Action & Modal Form AKU HAPUS TOTAL di sini untuk ngetes.
     }
 
     public function render(): View
