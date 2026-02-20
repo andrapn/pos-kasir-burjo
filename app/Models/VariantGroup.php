@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\VariantOption;
 class VariantGroup extends Model
 {
     protected $fillable = ['name', 'track_stock'];
