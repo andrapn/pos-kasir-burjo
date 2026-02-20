@@ -33,7 +33,7 @@ Route::get('/run-migrate', function () {
     return 'Database berhasil dimigrasi!';
 });
 
-Route::get('/', fn(): Factory|View => view('welcome'))->name('home');
+Route::get('/', fn() => redirect()->route('login'))->name('home');
 
 Route::get('dashboard', Livewire\Dashboard\Index::class)
     ->middleware(['auth'])
