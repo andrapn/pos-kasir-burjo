@@ -38,18 +38,18 @@
         <div class="flex-1 overflow-y-auto p-4">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 @forelse ($this->filteredItems as $item)
-<button
+                    <button
                         wire:click="addToCart({{ $item['id'] }})"
                         wire:loading.attr="disabled"
                         wire:target="addToCart({{ $item['id'] }})"
-                        class="group relative bg-white dark:bg-zinc-800 rounded-xl p-4 text-left
+                        class="group relative bg-white dark:bg-zinc-800 rounded-xl p-3.5 text-left
                                border-2 border-transparent hover:border-indigo-500 dark:hover:border-indigo-400
                                transition-all duration-150 hover:shadow-md active:scale-[0.98]
                                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
-                               dark:focus:ring-offset-zinc-900 flex flex-col justify-between min-h-[90px]"
+                               dark:focus:ring-offset-zinc-900 flex flex-col justify-between overflow-hidden"
                     >
                         {{-- Stock Indicator (Ping Animation) --}}
-                        <div class="absolute top-3 right-3">
+                        <div class="absolute top-3 right-3 z-10">
                             @if($item['stock'] <= 5)
                                 <span class="flex size-2">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -58,18 +58,22 @@
                             @endif
                         </div>
 
-                        {{-- Product Info (Tanpa Box Gambar) --}}
-                        <div class="w-full">
-                            <h3 class="font-medium text-sm text-zinc-900 dark:text-white line-clamp-2 leading-tight pr-4">
+                        {{-- Product Info --}}
+                        <div class="flex flex-col h-full w-full">
+                            <h3 class="font-medium text-sm text-zinc-900 dark:text-white line-clamp-2 leading-tight pr-3">
                                 {{ $item['name'] }}
                             </h3>
                             <p class="text-[10px] text-zinc-400 font-mono mt-0.5">{{ $item['sku'] }}</p>
                             
-                            <div class="flex items-center justify-between mt-4">
-                                <span class="text-base font-bold text-indigo-600 dark:text-indigo-400">
+                            {{-- Spacer biar harga & stok selalu terdorong ke paling bawah --}}
+                            <div class="flex-1 min-h-[1.5rem]"></div>
+
+                            {{-- flex-wrap & gap-1.5 adalah kunci biar nggak offside --}}
+                            <div class="flex flex-wrap items-end justify-between gap-1.5 mt-2">
+                                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">
                                     {{ \Illuminate\Support\Number::currency($item['price'], 'IDR') }}
                                 </span>
-                                <span class="text-[10px] px-1.5 py-0.5 rounded font-medium
+                                <span class="text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0 whitespace-nowrap
                                     {{ $item['stock'] > 10 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400' :
                                        ($item['stock'] > 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400' :
                                        'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400') }}">
@@ -80,7 +84,7 @@
 
                         {{-- Loading Overlay --}}
                         <div wire:loading wire:target="addToCart({{ $item['id'] }})"
-                             class="absolute inset-0 bg-white/80 dark:bg-zinc-800/80 rounded-xl flex items-center justify-center">
+                             class="absolute inset-0 bg-white/80 dark:bg-zinc-800/80 flex items-center justify-center z-20">
                             <flux:icon name="arrow-path" class="size-6 text-indigo-500 animate-spin" />
                         </div>
                     </button>
@@ -521,7 +525,6 @@
                 @endif
 
                 {{-- Action Buttons --}}
-{{-- Action Buttons --}}
                 <div class="grid grid-cols-2 gap-2">
                     <flux:button 
                         wire:click="holdOrder" 
