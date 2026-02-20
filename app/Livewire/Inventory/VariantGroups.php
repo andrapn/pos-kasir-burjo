@@ -1,26 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Inventory;
 
 use App\Models\VariantGroup;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Repeater;
-use Filament\Support\Enums\MaxWidth; // <- Ini kunci biar nggak dicoret lagi
-use Livewire\Component;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table; // <- Ini kunci biar nggak dicoret lagi
 use Illuminate\Contracts\View\View;
+use Livewire\Component;
 
-class VariantGroups extends Component implements HasForms, HasTable
+final class VariantGroups extends Component implements HasForms, HasTable
 {
     use InteractsWithForms;
     use InteractsWithTable;
@@ -59,6 +61,11 @@ class VariantGroups extends Component implements HasForms, HasTable
             ]);
     }
 
+    public function render(): View
+    {
+        return view('livewire.inventory.variant-groups');
+    }
+
     protected function getFormSchema(): array
     {
         return [
@@ -83,10 +90,5 @@ class VariantGroups extends Component implements HasForms, HasTable
                 ->addActionLabel('Tambah Pilihan')
                 ->required(),
         ];
-    }
-
-    public function render(): View
-    {
-        return view('livewire.inventory.variant-groups');
     }
 }
