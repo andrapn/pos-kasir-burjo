@@ -11,25 +11,25 @@ use App\Observers\SaleObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Http\Request; // FIX: Wajib import
-use Illuminate\Support\Facades\Date;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date; // FIX: Wajib import
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Number; // FIX: Wajib import buat IDR
+
+ // FIX: Wajib import buat IDR
 
 final class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
         Number::useLocale('id'); // Setup IDR
-        Gate::define('viewLogViewer', function (?\App\Models\User $user) {
-            return $user?->isAdmin() ?? false;
-        });
+        Gate::define('viewLogViewer', fn(?\App\Models\User $user) => $user?->isAdmin() ?? false);
         $this->configureCommands();
         $this->configureModels();
         $this->configureUrl();

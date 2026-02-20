@@ -34,10 +34,15 @@ final class Index extends Component implements HasActions, HasSchemas
 
     /** @var Collection<int, PaymentMethod> */
     public $paymentMethods;
-    public string $activeCategory = 'All';  
+
+    public string $activeCategory = 'All';
+
     public bool $showVariantModal = false;
-    public ?\App\Models\Item $selectedItemForVariant = null;
+
+    public ?Item $selectedItemForVariant = null;
+
     public array $itemVariants = [];
+
     public ?string $search = null;
 
     public ?string $customerSearch = null;
@@ -51,6 +56,7 @@ final class Index extends Component implements HasActions, HasSchemas
     public $paymentMethodId;
 
     public int $paidAmount = 0;
+
     public float $discountAmount = 0;
 
     public function mount(): void
@@ -62,7 +68,7 @@ final class Index extends Component implements HasActions, HasSchemas
             ->active()
             ->latest()
             ->get()
-            ->map(fn(Item $item): array => [    
+            ->map(fn(Item $item): array => [
                 'id' => $item->id,
                 'name' => $item->name,
                 'category' => $item->category ?? 'Makanan', // Tambahkan ini pengganti SKU
@@ -83,17 +89,17 @@ final class Index extends Component implements HasActions, HasSchemas
         // 1. Filter Kategori
         if ($this->activeCategory !== 'All') {
             $result = array_filter(
-                $result, 
-                fn(array $item): bool => ($item['category'] ?? '') === $this->activeCategory
+                $result,
+                fn(array $item): bool => ($item['category'] ?? '') === $this->activeCategory,
             );
         }
 
         // 2. Filter Pencarian Nama (SKU sudah dihapus)
-        if (!in_array($this->search, [null, '', '0'], true)) {
+        if ( ! in_array($this->search, [null, '', '0'], true)) {
             $search = mb_strtolower($this->search);
             $result = array_filter(
                 $result,
-                fn(array $item): bool => str_contains(mb_strtolower((string) $item['name']), $search)
+                fn(array $item): bool => str_contains(mb_strtolower((string) $item['name']), $search),
             );
         }
 
@@ -117,7 +123,7 @@ final class Index extends Component implements HasActions, HasSchemas
     public function totalBeforeDiscount(): int|float
     {
         // Langsung return subtotal saja tanpa ditambah tax
-        return $this->subtotal; 
+        return $this->subtotal;
     }
 
     #[Computed]
@@ -135,13 +141,14 @@ final class Index extends Component implements HasActions, HasSchemas
     public function addToCart(int $itemId): void
     {
         // Ambil item beserta variannya
-        $item = \App\Models\Item::with('variants')->find($itemId);
+        $item = Item::with('variants')->find($itemId);
 
         // Jika item punya varian, tahan dulu dan buka pop-up modal
         if ($item->variants->count() > 0) {
             $this->selectedItemForVariant = $item;
             $this->itemVariants = $item->variants->groupBy('group_name')->toArray();
             $this->showVariantModal = true;
+
             return;
         }
 
@@ -154,36 +161,17 @@ final class Index extends Component implements HasActions, HasSchemas
         $variant = \App\Models\ItemVariant::with('item')->find($variantId);
 
         if ($variant->stock !== null && $variant->stock <= 0) {
-            \Filament\Notifications\Notification::make()
+            Notification::make()
                 ->title('Gagal!')
                 ->body('Stok varian ini sudah habis.')
                 ->warning()
                 ->send();
+
             return;
         }
 
         $this->processAddToCart($variant->item, $variant);
         $this->showVariantModal = false; // Tutup modal setelah varian dipilih
-    }
-
-    private function processAddToCart($item, $variant = null): void
-    {
-        // Kunci keranjang gabungan ID Item + ID Varian, agar nutrisari semangka & nanas terpisah barisnya
-        $cartKey = $variant ? $item->id . '-' . $variant->id : (string)$item->id;
-
-        if (isset($this->cart[$cartKey])) {
-            $this->cart[$cartKey]['quantity']++;
-        } else {
-            $this->cart[$cartKey] = [
-                'id' => $item->id,
-                'variant_id' => $variant ? $variant->id : null,
-                'name' => $item->name . ($variant ? ' (' . $variant->name . ')' : ''),
-                'price' => $item->price,
-                'quantity' => 1,
-            ];
-        }
-
-        $this->calculateTotals();
     }
 
     public function removeCart(string $itemId): void
@@ -246,6 +234,7 @@ final class Index extends Component implements HasActions, HasSchemas
                 ->body('Tidak dapat menahan pesanan kosong.')
                 ->warning()
                 ->send();
+
             return;
         }
 
@@ -280,7 +269,7 @@ final class Index extends Component implements HasActions, HasSchemas
     {
         $heldOrders = session()->get('held_orders', []);
 
-        if (!isset($heldOrders[$index])) {
+        if ( ! isset($heldOrders[$index])) {
             return;
         }
 
@@ -291,12 +280,13 @@ final class Index extends Component implements HasActions, HasSchemas
                 ->body('Harap selesaikan atau kosongkan pesanan saat ini terlebih dahulu.')
                 ->warning()
                 ->send();
+
             return;
         }
 
         // 1. Panggil data dari session
         $order = $heldOrders[$index];
-        
+
         // 2. Kembalikan data ke layar kasir
         $this->cart = $order['cart'];
         $this->customerId = $order['customer_id'];
@@ -311,7 +301,7 @@ final class Index extends Component implements HasActions, HasSchemas
             ->success()
             ->send();
     }
-    
+
     public function submit(): void
     {
         $this->form->getState();
@@ -431,5 +421,25 @@ final class Index extends Component implements HasActions, HasSchemas
     public function render(): View
     {
         return view('livewire.pos.index');
+    }
+
+    private function processAddToCart($item, $variant = null): void
+    {
+        // Kunci keranjang gabungan ID Item + ID Varian, agar nutrisari semangka & nanas terpisah barisnya
+        $cartKey = $variant ? $item->id . '-' . $variant->id : (string) $item->id;
+
+        if (isset($this->cart[$cartKey])) {
+            $this->cart[$cartKey]['quantity']++;
+        } else {
+            $this->cart[$cartKey] = [
+                'id' => $item->id,
+                'variant_id' => $variant ? $variant->id : null,
+                'name' => $item->name . ($variant ? ' (' . $variant->name . ')' : ''),
+                'price' => $item->price,
+                'quantity' => 1,
+            ];
+        }
+
+        $this->calculateTotals();
     }
 }
