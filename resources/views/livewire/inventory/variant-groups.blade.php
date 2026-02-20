@@ -5,7 +5,9 @@
     </flux:header>
 
     <flux:main>
-        {{-- Ini akan memanggil tabel Filament yang kita buat di Logic tadi --}}
         {{ $this->table }}
+        
+        {{-- INI WAJIB ADA AGAR POP-UP FORM BISA MUNCUL --}}
+        <x-filament-actions::modals />
     </flux:main>
 </div>
