@@ -25,8 +25,7 @@ use App\Livewire\Settings\TwoFactor;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
-
-Route::get('/inventory/variants', VariantGroups::class)->name('variants.index');
+use Illuminate\Support\Facades\DB;
 
 Route::get('/run-migrate', function () {
     Artisan::call('migrate', ['--force' => true]);
@@ -68,7 +67,7 @@ Route::middleware(['auth'])->group(function (): void {
 
     // Inventory
     Route::get('/inventories', Livewire\Inventory\Index::class)->name('inventories');
-
+    Route::get('/inventory/variants', VariantGroups::class)->name('variants.index');
     // Customers
     Route::prefix('customers')->name('customers.')->group(function (): void {
         Route::get('/', Livewire\Customer\Index::class)->name('index');
