@@ -222,7 +222,7 @@
                         {{ __('Products') }}
                     </flux:navlist.item>
                 @endcan
-                {{-- @can('items.view')
+                @can('items.view')
                     <flux:navlist.item
                         wire:navigate
                         icon="rectangle-group"
@@ -231,8 +231,7 @@
                     >
                         {{ __('Master Variants') }}
                     </flux:navlist.item>
-                @endcan --}}
-                </flux:navlist.item>
+                @endcan
                 @can('inventory.view')
                     <flux:navlist.item
                         wire:navigate
@@ -243,26 +242,6 @@
                         {{ __('Stock Levels') }}
                     </flux:navlist.item>
                 @endcan
-
-                {{-- @can('inventory.adjust')
-                    <flux:navlist.item
-                        wire:navigate
-                        icon="adjustments-horizontal"
-                        href="#"
-                    >
-                        {{ __('Adjustments') }}
-                    </flux:navlist.item>
-                @endcan
-
-                @can('inventory.transfer')
-                    <flux:navlist.item
-                        wire:navigate
-                        icon="arrows-right-left"
-                        href="#"
-                    >
-                        {{ __('Transfers') }}
-                    </flux:navlist.item>
-                @endcan --}}
             </flux:navlist.group>
         @endcanany
 
