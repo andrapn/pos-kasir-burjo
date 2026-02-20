@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Livewire;
-use Illuminate\Support\Facades\DB;
 use App\Livewire\BackupManager;
 use App\Livewire\Customer\Show;
 use App\Livewire\Inventory\VariantGroups;
@@ -24,6 +23,7 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
