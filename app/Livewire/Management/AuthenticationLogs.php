@@ -11,8 +11,6 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Concerns\InteractsWithSchemas;
-use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -33,12 +31,11 @@ use Rappasoft\LaravelAuthenticationLog\Models\AuthenticationLog;
 use Stevebauman\Location\Facades\Location;
 
 // Ubah baris ini:
-final class AuthenticationLogs extends Component implements HasActions, HasSchemas, HasTable, HasForms
+final class AuthenticationLogs extends Component implements HasActions, HasTable, HasForms
 {
     use InteractsWithActions;
-    use InteractsWithSchemas;
     use InteractsWithTable;
-    use InteractsWithForms; // Tambahkan ini
+    use InteractsWithForms;
 
     public function table(Table $table): Table
     {
