@@ -17,7 +17,6 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -35,13 +34,11 @@ final class Index extends Component implements HasActions, HasSchemas
     /** @var Collection<int, PaymentMethod> */
     public $paymentMethods;
 
-    public string $activeCategory = 'All';
-
     public bool $showVariantModal = false;
-
-    public ?Item $selectedItemForVariant = null;
-
+    public int $selectedItemIdForVariant = 0;
+    public string $selectedItemNameForVariant = '';
     public array $itemVariants = [];
+    public array $selectedOptions = []; // Menyimpan pilihan kasir
 
     public ?string $search = null;
 
@@ -140,20 +137,92 @@ final class Index extends Component implements HasActions, HasSchemas
 
     public function addToCart(int $itemId): void
     {
-        // Ambil item beserta variannya
-        $item = Item::with('variants')->find($itemId);
+        $item = \App\Models\Item::with(['variantGroups.options'])->find($itemId);
 
-        // Jika item punya varian, tahan dulu dan buka pop-up modal
-        if ($item->variants->count() > 0) {
-            $this->selectedItemForVariant = $item;
-            $this->itemVariants = $item->variants->groupBy('group_name')->toArray();
+        if ($item && $item->variantGroups->count() > 0) {
+            // FIX 500 ERROR: Kita ubah model relasi menjadi Array murni agar Livewire tidak tersedak
+            $this->selectedItemIdForVariant = $item->id;
+            $this->selectedItemNameForVariant = $item->name;
+            $this->selectedOptions = []; // Reset pilihan kasir
+            
+            $this->itemVariants = $item->variantGroups->map(function($group) use ($item) {
+                return [
+                    'group_id' => $group->id,
+                    'group_name' => $group->name,
+                    'track_stock' => $group->track_stock,
+                    'options' => $group->options->map(function($opt) use ($item, $group) {
+                        // Jika grup ini mendeteksi stok, ambil stok dari tabel inventory
+                        $stock = null;
+                        if ($group->track_stock) {
+                            $inv = \App\Models\Inventory::where('item_id', $item->id)
+                                ->where('variant_option_id', $opt->id)->first();
+                            $stock = $inv ? $inv->quantity : 0;
+                        }
+
+                        return [
+                            'id' => $opt->id,
+                            'name' => $opt->name,
+                            'stock' => $stock,
+                        ];
+                    })->toArray()
+                ];
+            })->toArray();
+
             $this->showVariantModal = true;
-
             return;
         }
 
-        // Jika tidak ada varian, langsung masuk keranjang
+        // Jika barang reguler tanpa varian
         $this->processAddToCart($item);
+    }
+
+    public function confirmVariantSelection(): void
+    {
+        // Pastikan kasir memilih 1 opsi dari setiap grup (cth: wajib pilih Rasa & wajib pilih Suhu)
+        if (count($this->selectedOptions) !== count($this->itemVariants)) {
+            Notification::make()->title('Gagal!')->body('Harap pilih semua varian.')->warning()->send();
+            return;
+        }
+
+        $item = \App\Models\Item::find($this->selectedItemIdForVariant);
+        
+        $selectedOptionNames = [];
+        $variantIds = [];
+        
+        foreach ($this->itemVariants as $group) {
+            $optId = $this->selectedOptions[$group['group_id']];
+            $variantIds[] = $optId;
+            $opt = collect($group['options'])->firstWhere('id', $optId);
+            $selectedOptionNames[] = $opt['name'];
+            
+            // Validasi limitasi stok
+            if ($group['track_stock']) {
+                $cartKey = $item->id . '-' . implode('-', $variantIds);
+                $currentQty = $this->cart[$cartKey]['quantity'] ?? 0;
+                if ($currentQty >= $opt['stock']) {
+                     Notification::make()->title("Stok {$opt['name']} tidak cukup!")->danger()->send();
+                     return;
+                }
+            }
+        }
+
+        $variantString = implode(', ', $selectedOptionNames);
+        $cartKey = $item->id . '-' . implode('-', $variantIds);
+
+        if (isset($this->cart[$cartKey])) {
+            $this->cart[$cartKey]['quantity']++;
+        } else {
+            $this->cart[$cartKey] = [
+                'id' => $item->id,
+                'variant_ids' => $variantIds,
+                'name' => $item->name . ' (' . $variantString . ')',
+                'price' => $item->price,
+                'quantity' => 1,
+            ];
+        }
+
+        $this->showVariantModal = false;
+        Notification::make()->title('Masuk Keranjang!')->success()->send();
     }
 
     public function addVariantToCart(int $variantId): void

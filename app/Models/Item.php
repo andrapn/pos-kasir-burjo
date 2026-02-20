@@ -90,4 +90,8 @@ final class Item extends Model
     {
         $query->where('status', ItemStatus::INACTIVE->value);
     }
+    public function variantGroups()
+    {
+        return $this->belongsToMany(VariantGroup::class, 'item_variant_group');
+    }
 }
