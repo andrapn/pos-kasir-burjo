@@ -141,11 +141,32 @@
                         <p class="text-xs text-zinc-500">{{ count($this->cart) }} items</p>
                     </div>
                 </div>
-                @if(count($this->cart) > 0)
-                    <flux:button size="sm" variant="ghost" icon="trash" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
-                        Clear
-                    </flux:button>
-                @endif
+                
+                <div class="flex items-center gap-2">
+                    {{-- Dropdown Held Orders (Hanya muncul jika ada order yang ditahan) --}}
+                    @if(count(session('held_orders', [])) > 0)
+                        <flux:dropdown position="bottom" align="end">
+                            <flux:button size="sm" variant="filled" color="amber" icon="clock">
+                                {{ count(session('held_orders', [])) }} Held
+                            </flux:button>
+                            <flux:menu class="w-72">
+                                <flux:menu.heading>Held Orders</flux:menu.heading>
+                                @foreach(session('held_orders', []) as $index => $heldOrder)
+                                    <flux:menu.item wire:click="restoreOrder({{ $index }})" icon="arrow-uturn-left">
+                                        Hold #{{ $index + 1 }} ({{ $heldOrder['time'] }}) - {{ \Illuminate\Support\Number::currency($heldOrder['total'], 'IDR') }}
+                                    </flux:menu.item>
+                                @endforeach
+                            </flux:menu>
+                        </flux:dropdown>
+                    @endif
+
+                    {{-- Tombol Clear --}}
+                    @if(count($this->cart) > 0)
+                        <flux:button wire:click="clearCart" size="sm" variant="ghost" icon="trash" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+                            Clear
+                        </flux:button>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -407,10 +428,10 @@
                     <span class="text-zinc-500">Subtotal</span>
                     <span class="text-zinc-900 dark:text-white">{{ \Illuminate\Support\Number::currency($this->subtotal, 'IDR') }}</span>
                 </div>
-                <div class="flex justify-between text-sm">
+                {{-- <div class="flex justify-between text-sm">
                     <span class="text-zinc-500">Tax (15%)</span>
                     <span class="text-zinc-900 dark:text-white">{{ \Illuminate\Support\Number::currency($this->tax, 'IDR') }}</span>
-                </div>
+                </div> --}}
 
 
                 {{-- Discount Section --}}
@@ -509,8 +530,15 @@
                 @endif
 
                 {{-- Action Buttons --}}
+{{-- Action Buttons --}}
                 <div class="grid grid-cols-2 gap-2">
-                    <flux:button variant="ghost" icon="document-text" class="justify-center">
+                    <flux:button 
+                        wire:click="holdOrder" 
+                        variant="ghost" 
+                        icon="document-text" 
+                        class="justify-center"
+                        :disabled="count($this->cart) === 0"
+                    >
                         Hold Order
                     </flux:button>
                     <flux:button

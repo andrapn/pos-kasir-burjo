@@ -68,9 +68,9 @@
 
     <flux:navbar class="me-1.5 space-x-0.5 rtl:space-x-reverse">
         <!-- Search -->
-        <flux:tooltip :content="__('Search')" position="bottom">
+        {{-- <flux:tooltip :content="__('Search')" position="bottom">
             <flux:navbar.item icon="magnifying-glass" href="#" :label="__('Search')"/>
-        </flux:tooltip>
+        </flux:tooltip> --}}
 
         <!-- Dark/Light Mode Toggle -->
         <flux:tooltip :content="__('Toggle theme')" position="bottom">
@@ -199,7 +199,7 @@
                     </flux:navlist.item>
                 @endcan
 
-                @can('sales.refund')
+                {{-- @can('sales.refund')
                     <flux:navlist.item
                         wire:navigate
                         icon="receipt-refund"
@@ -207,7 +207,7 @@
                     >
                         {{ __('Refunds') }}
                     </flux:navlist.item>
-                @endcan
+                @endcan --}}
             </flux:navlist.group>
         @endcanany
 
@@ -236,7 +236,7 @@
                     </flux:navlist.item>
                 @endcan
 
-                @can('inventory.adjust')
+                {{-- @can('inventory.adjust')
                     <flux:navlist.item
                         wire:navigate
                         icon="adjustments-horizontal"
@@ -254,7 +254,7 @@
                     >
                         {{ __('Transfers') }}
                     </flux:navlist.item>
-                @endcan
+                @endcan --}}
             </flux:navlist.group>
         @endcanany
 
@@ -297,7 +297,7 @@
                     </flux:navlist.item>
                 @endcan
 
-                @can('sales.export')
+                {{-- @can('sales.export')
                     <flux:navlist.item
                         wire:navigate
                         icon="document-chart-bar"
@@ -305,7 +305,7 @@
                     >
                         {{ __('Reports') }}
                     </flux:navlist.item>
-                @endcan
+                @endcan --}}
             </flux:navlist.group>
         @endcanany
 
@@ -370,7 +370,7 @@
                     </flux:navlist.item>
                 @endcan
 
-                @can('settings.view')
+                {{-- @can('settings.view')
                     <flux:navlist.item
                         wire:navigate
                         icon="cog-6-tooth"
@@ -378,7 +378,7 @@
                     >
                         {{ __('Settings') }}
                     </flux:navlist.item>
-                @endcan
+                @endcan --}}
 
                 <flux:navlist.item
                     icon="document-text"

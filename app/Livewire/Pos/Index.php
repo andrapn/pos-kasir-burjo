@@ -99,13 +99,14 @@ final class Index extends Component implements HasActions, HasSchemas
     #[Computed]
     public function tax(): float
     {
-        return $this->subtotal * 0.15;
+        return 0; // Set menjadi 0 agar tidak ada nilai pajak
     }
 
     #[Computed]
     public function totalBeforeDiscount(): int|float
     {
-        return $this->subtotal + $this->tax;
+        // Langsung return subtotal saja tanpa ditambah tax
+        return $this->subtotal; 
     }
 
     #[Computed]
@@ -206,6 +207,81 @@ final class Index extends Component implements HasActions, HasSchemas
         $this->paidAmount = 0;
     }
 
+    public function holdOrder(): void
+    {
+        // 1. Cek apakah keranjang kosong
+        if ($this->cart === []) {
+            Notification::make()
+                ->title('Gagal!')
+                ->body('Tidak dapat menahan pesanan kosong.')
+                ->warning()
+                ->send();
+            return;
+        }
+
+        // 2. Ambil data hold order yang sudah ada di session (jika ada)
+        $heldOrders = session()->get('held_orders', []);
+
+        // 3. Tambahkan order saat ini ke dalam array
+        $heldOrders[] = [
+            'time' => now()->format('H:i'),
+            'customer_id' => $this->customerId,
+            'cart' => $this->cart,
+            'discount' => $this->discountAmount,
+            'total' => $this->total,
+        ];
+
+        // 4. Simpan kembali ke session
+        session()->put('held_orders', $heldOrders);
+
+        // 5. Bersihkan layar kasir untuk pelanggan berikutnya
+        $this->clearCart();
+        $this->customerId = null;
+        $this->paymentMethodId = null;
+
+        Notification::make()
+            ->title('Order Held!')
+            ->body('Pesanan berhasil disimpan sementara.')
+            ->success()
+            ->send();
+    }
+
+    public function restoreOrder(int $index): void
+    {
+        $heldOrders = session()->get('held_orders', []);
+
+        if (!isset($heldOrders[$index])) {
+            return;
+        }
+
+        // Pastikan kasir mengosongkan layar dulu sebelum memanggil order yang ditahan
+        if ($this->cart !== []) {
+            Notification::make()
+                ->title('Tidak bisa memuat pesanan!')
+                ->body('Harap selesaikan atau kosongkan pesanan saat ini terlebih dahulu.')
+                ->warning()
+                ->send();
+            return;
+        }
+
+        // 1. Panggil data dari session
+        $order = $heldOrders[$index];
+        
+        // 2. Kembalikan data ke layar kasir
+        $this->cart = $order['cart'];
+        $this->customerId = $order['customer_id'];
+        $this->discountAmount = $order['discount'];
+
+        // 3. Hapus data order tersebut dari daftar hold
+        unset($heldOrders[$index]);
+        session()->put('held_orders', array_values($heldOrders)); // Reindex urutan array
+
+        Notification::make()
+            ->title('Pesanan Dimuat!')
+            ->success()
+            ->send();
+    }
+    
     public function submit(): void
     {
         $this->form->getState();
