@@ -23,9 +23,9 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
-use Illuminate\Support\Facades\DB;
 
 Route::get('/run-migrate', function () {
     Artisan::call('migrate', ['--force' => true]);
