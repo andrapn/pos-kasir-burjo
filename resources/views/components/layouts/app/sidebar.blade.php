@@ -222,7 +222,7 @@
                         {{ __('Products') }}
                     </flux:navlist.item>
                 @endcan
-                @can('items.view')
+                {{-- @can('items.view')
                     <flux:navlist.item
                         wire:navigate
                         icon="rectangle-group"
@@ -231,7 +231,7 @@
                     >
                         {{ __('Master Variants') }}
                     </flux:navlist.item>
-                @endcan
+                @endcan --}}
                 </flux:navlist.item>
                 @can('inventory.view')
                     <flux:navlist.item
