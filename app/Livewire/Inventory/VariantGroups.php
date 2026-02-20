@@ -1,36 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Inventory;
 
 use App\Models\VariantGroup;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-
-// 👇 INI DIA 2 BARIS SURAT IZIN YANG BIKIN ERROR SELAMA INI 👇
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
+// 👇 INI DIA 2 BARIS SURAT IZIN YANG BIKIN ERROR SELAMA INI 👇
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Support\Enums\MaxWidth;
-use Livewire\Component;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Livewire\Component;
 
 // 👇 WAJIB tambahkan HasActions di sini 👇
-class VariantGroups extends Component implements HasForms, HasTable, HasActions
+final class VariantGroups extends Component implements HasForms, HasTable, HasActions
 {
+    use InteractsWithActions;
     use InteractsWithForms;
-    use InteractsWithTable;
-    use InteractsWithActions; // 👇 WAJIB tambahkan ini agar Modal bisa terbuka 👇
+    use InteractsWithTable; // 👇 WAJIB tambahkan ini agar Modal bisa terbuka 👇
 
     public function table(Table $table): Table
     {
@@ -40,15 +40,15 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 TextColumn::make('name')
                     ->label('Nama Grup (Cth: Rasa)')
                     ->searchable(),
-                
+
                 IconColumn::make('track_stock')
                     ->label('Pakai Stok?')
                     ->boolean(),
-                
+
                 TextColumn::make('options_count')
                     ->label('Jumlah Pilihan')
                     ->counts('options'),
-                
+
                 TextColumn::make('options.name')
                     ->label('Daftar Opsi')
                     ->badge(),
@@ -68,6 +68,11 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
             ]);
     }
 
+    public function render(): View
+    {
+        return view('livewire.inventory.variant-groups');
+    }
+
     protected function getFormSchema(): array
     {
         return [
@@ -75,12 +80,12 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 ->label('Judul Varian')
                 ->placeholder('Cth: Rasa Nutrisari, Level Pedas')
                 ->required(),
-            
+
             Toggle::make('track_stock')
                 ->label('Aktifkan Manajemen Stok?')
                 ->helperText('Nyalakan jika varian ini memotong stok. Matikan jika hanya pelengkap.')
                 ->default(false),
-            
+
             Repeater::make('options')
                 ->relationship('options')
                 ->label('Isi Pilihan Varian')
@@ -94,10 +99,5 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 ->addActionLabel('Tambah Pilihan')
                 ->required(),
         ];
-    }
-
-    public function render(): View
-    {
-        return view('livewire.inventory.variant-groups');
     }
 }
