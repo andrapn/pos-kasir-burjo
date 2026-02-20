@@ -76,7 +76,7 @@
                             <p class="text-[10px] text-zinc-400 font-mono">{{ $item['sku'] }}</p>
                             <div class="flex items-center justify-between pt-1">
                                 <span class="text-base font-bold text-indigo-600 dark:text-indigo-400">
-                                    {{ number_format($item['price'], 'IDR') }}
+                                    {{ \Illuminate\Support\Number::currency($item['price'], 'IDR') }}
                                 </span>
                                 <span class="text-[10px] px-1.5 py-0.5 rounded
                                     {{ $item['stock'] > 10 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400' :
@@ -165,7 +165,7 @@
                                 {{ $cartItem['name'] }}
                             </h4>
                             <p class="text-xs text-zinc-500 mt-0.5">
-                                {{ number_format($cartItem['price'], 'IDR') }} × {{ $cartItem['quantity'] }}
+                                {{ \Illuminate\Support\Number::currency($cartItem['price'], 'IDR') }} × {{ $cartItem['quantity'] }}
                             </p>
 
                             {{-- Quantity Controls --}}
@@ -202,7 +202,7 @@
                         {{-- Item Total --}}
                         <div class="text-right">
                             <span class="font-bold text-zinc-900 dark:text-white">
-                                {{ number_format($cartItem['price'] * $cartItem['quantity'], 'IDR') }}
+                                {{ \Illuminate\Support\Number::currency($cartItem['price'] * $cartItem['quantity'], 'IDR') }}
                             </span>
                         </div>
                     </div>
@@ -405,11 +405,11 @@
             <div class="p-4 space-y-2">
                 <div class="flex justify-between text-sm">
                     <span class="text-zinc-500">Subtotal</span>
-                    <span class="text-zinc-900 dark:text-white">{{ number_format($this->subtotal, 'IDR') }}</span>
+                    <span class="text-zinc-900 dark:text-white">{{ \Illuminate\Support\Number::currency($this->subtotal, 'IDR') }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-zinc-500">Tax (15%)</span>
-                    <span class="text-zinc-900 dark:text-white">{{ number_format($this->tax, 'IDR') }}</span>
+                    <span class="text-zinc-900 dark:text-white">{{ \Illuminate\Support\Number::currency($this->tax, 'IDR') }}</span>
                 </div>
 
 
@@ -473,7 +473,7 @@
                 <div class="flex justify-between items-center pt-3 border-t border-zinc-200 dark:border-zinc-700">
                     <span class="font-semibold text-zinc-900 dark:text-white">Total</span>
                     <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                        {{ number_format($this->total, 'IDR') }}
+                        {{ \Illuminate\Support\Number::currency($this->total, 'IDR') }}
                     </span>
                 </div>
             </div>
@@ -503,7 +503,7 @@
                             {{ $this->change >= 0 ? 'Change' : 'Amount Due' }}
                         </span>
                         <span class="text-xl font-bold {{ $this->change >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }}">
-                            {{ number_format(abs($this->change), 'IDR') }}
+                            {{ \Illuminate\Support\Number::currency(abs($this->change), 'IDR') }}
                         </span>
                     </div>
                 @endif

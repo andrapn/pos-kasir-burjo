@@ -21,7 +21,7 @@
                 <div>
                     <flux:subheading>Today's Sales</flux:subheading>
                     <flux:heading size="xl" class="mt-1">
-                        {{ number_format($this->todaySales['total'], 'IDR') }}
+                        {{ \Illuminate\Support\Number::currency($this->todaySales['total'], 'IDR') }}
                     </flux:heading>
                     <flux:subheading size="sm" class="mt-1">
                         {{ $this->todaySales['count'] }} transactions
@@ -67,7 +67,7 @@
                 <div>
                     <flux:subheading>This Month</flux:subheading>
                     <flux:heading size="xl" class="mt-1">
-                        {{ number_format($this->monthSales['total'], 'IDR') }}
+                        {{ \Illuminate\Support\Number::currency($this->monthSales['total'], 'IDR') }}
                     </flux:heading>
                     <flux:subheading size="sm" class="mt-1">
                         {{ $this->monthSales['count'] }} sales
@@ -233,7 +233,7 @@
                             </flux:badge>
                             <div class="text-right">
                                 <p class="font-bold text-emerald-600 dark:text-emerald-400">
-                                    {{ number_format($sale->total, 'IDR') }}
+                                    {{ \Illuminate\Support\Number::currency($sale->total, 'IDR') }}
                                 </p>
                                 <flux:subheading size="sm">{{ $sale->sales_items_count }} items</flux:subheading>
                             </div>
