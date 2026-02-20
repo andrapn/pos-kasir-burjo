@@ -11,6 +11,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
@@ -18,7 +19,6 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table; // <- Ini kunci biar nggak dicoret lagi
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
@@ -44,7 +44,7 @@ final class VariantGroups extends Component implements HasForms, HasTable
                 TextColumn::make('options.name')
                     ->label('Daftar Opsi')
                     ->badge()
-                    ->listLimit(3), // <- Ini yang benar untuk Filament v3
+                    ->limitList(3), // <- Ini yang benar untuk Filament v3
             ])
             ->headerActions([
                 CreateAction::make()
