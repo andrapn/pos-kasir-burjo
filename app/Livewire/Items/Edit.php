@@ -7,6 +7,7 @@ namespace App\Livewire\Items;
 use App\Enums\ItemStatus;
 use App\Models\Item;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Repeater;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Select;
@@ -51,13 +52,35 @@ final class Edit extends Component implements HasActions, HasSchemas
                                     ->maxLength(255)
                                     ->autofocus()
                                     ->columnSpan(1),
-                                TextInput::make('sku')
-                                    ->label('SKU')
-                                    ->placeholder('Enter SKU')
+                                Select::make('category')
+                                    ->label('Kategori')
+                                    ->options([
+                                        'Makanan' => 'Makanan',
+                                        'Snack' => 'Snack',
+                                        'Minuman' => 'Minuman',
+                                    ])
                                     ->required()
-                                    ->maxLength(100)
-                                    ->unique(Item::class, 'sku', ignoreRecord: true)
-                                    ->columnSpan(1),
+                                    ->default('Makanan'),
+
+                                Repeater::make('variants')
+                                    ->relationship('variants')
+                                    ->label('Varian Produk (Opsional)')
+                                    ->schema([
+                                        TextInput::make('group_name')
+                                            ->label('Grup Varian (Cth: Rasa)')
+                                            ->required(),
+                                        TextInput::make('name')
+                                            ->label('Pilihan (Cth: Semangka)')
+                                            ->required(),
+                                        TextInput::make('stock')
+                                            ->label('Stok Tambahan')
+                                            ->numeric()
+                                            ->nullable()
+                                            ->helperText('Kosongkan jika tidak perlu dilacak'),
+                                    ])
+                                    ->columns(3)
+                                    ->columnSpanFull()
+                                    ->addActionLabel('Tambah Varian'),
                                 TextInput::make('price')
                                     ->label('Price')
                                     ->placeholder('0.00')

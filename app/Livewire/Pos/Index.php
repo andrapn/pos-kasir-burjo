@@ -34,7 +34,10 @@ final class Index extends Component implements HasActions, HasSchemas
 
     /** @var Collection<int, PaymentMethod> */
     public $paymentMethods;
-
+    public string $activeCategory = 'All';  
+    public bool $showVariantModal = false;
+    public ?\App\Models\Item $selectedItemForVariant = null;
+    public array $itemVariants = [];
     public ?string $search = null;
 
     public ?string $customerSearch = null;
@@ -48,7 +51,6 @@ final class Index extends Component implements HasActions, HasSchemas
     public $paymentMethodId;
 
     public int $paidAmount = 0;
-
     public float $discountAmount = 0;
 
     public function mount(): void
@@ -60,10 +62,10 @@ final class Index extends Component implements HasActions, HasSchemas
             ->active()
             ->latest()
             ->get()
-            ->map(fn(Item $item): array => [
+            ->map(fn(Item $item): array => [    
                 'id' => $item->id,
                 'name' => $item->name,
-                'sku' => $item->sku,
+                'category' => $item->category ?? 'Makanan', // Tambahkan ini pengganti SKU
                 'price' => $item->price,
                 'stock' => $item->inventory->quantity,
             ])
@@ -76,17 +78,26 @@ final class Index extends Component implements HasActions, HasSchemas
     #[Computed]
     public function filteredItems(): array
     {
-        if (in_array($this->search, [null, '', '0'], true)) {
-            return $this->items;
+        $result = $this->items;
+
+        // 1. Filter Kategori
+        if ($this->activeCategory !== 'All') {
+            $result = array_filter(
+                $result, 
+                fn(array $item): bool => ($item['category'] ?? '') === $this->activeCategory
+            );
         }
 
-        $search = mb_strtolower($this->search);
+        // 2. Filter Pencarian Nama (SKU sudah dihapus)
+        if (!in_array($this->search, [null, '', '0'], true)) {
+            $search = mb_strtolower($this->search);
+            $result = array_filter(
+                $result,
+                fn(array $item): bool => str_contains(mb_strtolower((string) $item['name']), $search)
+            );
+        }
 
-        return array_filter(
-            $this->items,
-            fn(array $item): bool => str_contains(mb_strtolower((string) $item['name']), $search)
-                || str_contains(mb_strtolower((string) $item['sku']), $search),
-        );
+        return $result;
     }
 
     #[Computed]
@@ -123,45 +134,64 @@ final class Index extends Component implements HasActions, HasSchemas
 
     public function addToCart(int $itemId): void
     {
-        $item = collect($this->items)->firstWhere('id', $itemId);
+        // Ambil item beserta variannya
+        $item = \App\Models\Item::with('variants')->find($itemId);
 
-        if ( ! $item) {
-            Notification::make()->title('Item not found!')->danger()->send();
-
+        // Jika item punya varian, tahan dulu dan buka pop-up modal
+        if ($item->variants->count() > 0) {
+            $this->selectedItemForVariant = $item;
+            $this->itemVariants = $item->variants->groupBy('group_name')->toArray();
+            $this->showVariantModal = true;
             return;
         }
 
-        $stock = $item['stock'];
-
-        if ($stock <= 0) {
-            Notification::make()->title('Out of stock!')->danger()->send();
-
-            return;
-        }
-
-        $currentQty = $this->cart[$itemId]['quantity'] ?? 0;
-
-        if ($currentQty >= $stock) {
-            Notification::make()->title("Only {$stock} in stock")->warning()->send();
-
-            return;
-        }
-
-        $this->cart[$itemId] = [
-            'id' => $item['id'],
-            'name' => $item['name'],
-            'sku' => $item['sku'],
-            'price' => $item['price'],
-            'quantity' => $currentQty + 1,
-        ];
+        // Jika tidak ada varian, langsung masuk keranjang
+        $this->processAddToCart($item);
     }
 
-    public function removeCart(int $itemId): void
+    public function addVariantToCart(int $variantId): void
+    {
+        $variant = \App\Models\ItemVariant::with('item')->find($variantId);
+
+        if ($variant->stock !== null && $variant->stock <= 0) {
+            \Filament\Notifications\Notification::make()
+                ->title('Gagal!')
+                ->body('Stok varian ini sudah habis.')
+                ->warning()
+                ->send();
+            return;
+        }
+
+        $this->processAddToCart($variant->item, $variant);
+        $this->showVariantModal = false; // Tutup modal setelah varian dipilih
+    }
+
+    private function processAddToCart($item, $variant = null): void
+    {
+        // Kunci keranjang gabungan ID Item + ID Varian, agar nutrisari semangka & nanas terpisah barisnya
+        $cartKey = $variant ? $item->id . '-' . $variant->id : (string)$item->id;
+
+        if (isset($this->cart[$cartKey])) {
+            $this->cart[$cartKey]['quantity']++;
+        } else {
+            $this->cart[$cartKey] = [
+                'id' => $item->id,
+                'variant_id' => $variant ? $variant->id : null,
+                'name' => $item->name . ($variant ? ' (' . $variant->name . ')' : ''),
+                'price' => $item->price,
+                'quantity' => 1,
+            ];
+        }
+
+        $this->calculateTotals();
+    }
+
+    public function removeCart(string $itemId): void
     {
         unset($this->cart[$itemId]);
     }
 
-    public function updateQuantity($itemId, $quantity): void
+    public function updateQuantity(string $itemId, $quantity): void
     {
         $quantity = max(1, (int) $quantity);
 
@@ -179,7 +209,7 @@ final class Index extends Component implements HasActions, HasSchemas
         }
     }
 
-    public function incrementQuantity(int $itemId): void
+    public function incrementQuantity(string $itemId): void
     {
         if (isset($this->cart[$itemId])) {
             $item = collect($this->items)->firstWhere('id', $itemId);
@@ -189,7 +219,7 @@ final class Index extends Component implements HasActions, HasSchemas
         }
     }
 
-    public function decrementQuantity(int $itemId): void
+    public function decrementQuantity(string $itemId): void
     {
         if (isset($this->cart[$itemId])) {
             if ($this->cart[$itemId]['quantity'] > 1) {

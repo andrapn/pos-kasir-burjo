@@ -60,7 +60,10 @@ final class Item extends Model
     {
         return $this->hasOne(related: Inventory::class, foreignKey: 'item_id');
     }
-
+    public function variants()  
+    {
+        return $this->hasMany(ItemVariant::class);
+    }
     public function salesItems(): HasMany
     {
         return $this->hasMany(related: SalesItem::class, foreignKey: 'item_id');

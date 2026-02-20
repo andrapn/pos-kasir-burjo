@@ -33,7 +33,18 @@
                 <flux:button icon="squares-2x2" variant="ghost" />
             </div>
         </div>
-
+{{-- Tabs Kategori --}}
+        <div class="flex space-x-2 mb-4 p-1 overflow-x-auto">
+            @foreach(['All', 'Makanan', 'Snack', 'Minuman'] as $cat)
+                <button
+                    wire:click="$set('activeCategory', '{{ $cat }}')"
+                    class="px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap
+                        {{ $activeCategory === $cat ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700' }}"
+                >
+                    {{ $cat }}
+                </button>
+            @endforeach
+        </div>
         {{-- Products Grid --}}
         <div class="flex-1 overflow-y-auto p-4">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -548,4 +559,41 @@
             </div>
         </div>
     </div>
+{{-- Modal Pop-up Pilih Varian --}}
+    <flux:modal wire:model="showVariantModal" class="min-w-[400px]">
+        @if($selectedItemForVariant)
+            <div class="p-5">
+                <h2 class="text-xl font-bold mb-4 text-zinc-900 dark:text-white">
+                    Pilih Varian: {{ $selectedItemForVariant->name }}
+                </h2>
+
+                <div class="space-y-5">
+                    @foreach($itemVariants as $groupName => $variants)
+                        <div>
+                            <h3 class="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-2">{{ $groupName }}</h3>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($variants as $variant)
+                                    <button
+                                        wire:click="addVariantToCart({{ $variant['id'] }})"
+                                        class="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm font-medium hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all text-left"
+                                    >
+                                        {{ $variant['name'] }}
+                                        @if($variant['stock'] !== null)
+                                            <span class="block mt-0.5 text-[10px] {{ $variant['stock'] > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500' }}">
+                                                Stok: {{ $variant['stock'] }}
+                                            </span>
+                                        @endif
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <flux:button wire:click="$set('showVariantModal', false)" variant="ghost">Batal</flux:button>
+                </div>
+            </div>
+        @endif
+    </flux:modal>
 </div>
