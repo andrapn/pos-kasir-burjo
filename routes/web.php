@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Livewire;
-use Illuminate\Support\Facades\DB;
 use App\Livewire\BackupManager;
 use App\Livewire\Customer\Show;
 use App\Livewire\Inventory\VariantGroups;
@@ -24,6 +23,11 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
 use Illuminate\Support\Facades\Artisan;
+<<<<<<< HEAD
+=======
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
+>>>>>>> 46392659b6925639a409da7c85fccb8e1358450b
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -67,7 +71,7 @@ Route::middleware(['auth'])->group(function (): void {
 
     // Inventory
     Route::get('/inventories', Livewire\Inventory\Index::class)->name('inventories');
-Route::get('/inventory/variants', VariantGroups::class)->name('variants.index');
+    Route::get('/inventory/variants', VariantGroups::class)->name('variants.index');
     // Customers
     Route::prefix('customers')->name('customers.')->group(function (): void {
         Route::get('/', Livewire\Customer\Index::class)->name('index');
