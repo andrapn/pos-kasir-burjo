@@ -38,7 +38,7 @@ final class Index extends Component implements HasActions, HasSchemas
     public array $selectedOptions = [];
     public ?string $search = null;
     public ?string $customerSearch = null;
-    public string $activeCategory = 'All';
+    public string $activeCategory = 'Menu Nasi';
     public array $cart = [];
     public ?array $data = [];
     public $customerId;
