@@ -159,7 +159,7 @@
             </div>
         </div>
         <div class="flex-1 overflow-y-auto">
-            @forelse($this->cart as $cartItem)
+            @forelse($this->cart as $index => $cartItem)
                 <div class="px-4 py-3 border-b border-zinc-100 dark:border-zinc-700/50 hover:bg-zinc-50 dark:hover:bg-zinc-700/30 transition-colors">
                     <div class="flex gap-3">
                         <div class="size-14 bg-zinc-100 dark:bg-zinc-700 rounded-lg flex items-center justify-center shrink-0">
