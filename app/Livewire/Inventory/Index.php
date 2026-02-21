@@ -8,6 +8,8 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use App\Enums\ItemStatus;
 use App\Models\Inventory;
+use App\Models\VariantOption;
+use Closure;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -30,7 +32,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use App\Models\VariantOption;
+
 final class Index extends Component implements HasActions, HasSchemas, HasTable
 {
     use InteractsWithActions;
@@ -50,7 +52,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->formatStateUsing(function ($record) {
                         $name = ucfirst((string) $record->item->name);
                         if ($record->variant_option_id) {
-                            $variant = \App\Models\VariantOption::find($record->variant_option_id);
+                            $variant = VariantOption::find($record->variant_option_id);
                             if ($variant) {
                                 $name .= ' (' . $variant->name . ')';
                             }
@@ -141,10 +143,23 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->native(false)
                             ->prefixIcon('heroicon-o-cube')
                             ->placeholder('Select a product')
-                            ->live() // BIKIN LIVE BIAR BISA TRIGGER VARIAN
-                            ->afterStateUpdated(fn (Set $set) => $set('variant_option_id', null)),
+                            ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('variant_option_id', null))
+                            // VVV TAMBAHAN VALIDASI ANTI DOBEL VVV
+                            ->rules([
+                                fn (Get $get) => function (string $attribute, $value, Closure $fail) {
+                                    $item = Item::with('variantGroups')->find($value);
+                                    $hasVariants = $item && $item->variantGroups->where('track_stock', true)->isNotEmpty();
+                                    
+                                    if (!$hasVariants) {
+                                        $exists = Inventory::where('item_id', $value)->whereNull('variant_option_id')->exists();
+                                        if ($exists) {
+                                            $fail('Stok produk ini sudah tercatat. Silakan gunakan tombol Edit (ikon pensil) di tabel.');
+                                        }
+                                    }
+                                },
+                            ]),
 
-                        // TAMBAHAN DROPDOWN VARIAN DINAMIS
                         Select::make('variant_option_id')
                             ->label('Pilih Varian (Wajib)')
                             ->prefixIcon('heroicon-o-tag')
@@ -178,8 +193,17 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                 return $item && $item->variantGroups->where('track_stock', true)->isNotEmpty();
                             })
                             ->searchable()
-                            ->preload(),
-
+                            ->preload()
+                            ->rules([
+                                fn (Get $get) => function (string $attribute, $value, Closure $fail) use ($get) {
+                                    $exists = Inventory::where('item_id', $get('item_id'))
+                                        ->where('variant_option_id', $value)
+                                        ->exists();
+                                    if ($exists) {
+                                        $fail('Stok varian ini sudah tercatat. Silakan gunakan tombol Edit (ikon pensil) di tabel.');
+                                    }
+                                },
+                            ]),
                         TextInput::make('quantity')
                             ->label('Initial Quantity')
                             ->numeric()
@@ -190,6 +214,93 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->hint('Enter the initial stock quantity'),
                     ]),
             ])
+            ->recordActions([
+                ViewAction::make()
+                    ->modalHeading('Inventory Details')
+                    ->modalIcon('heroicon-o-archive-box')
+                    ->schema([
+                        Section::make('Product Information')
+                            ->icon('heroicon-o-cube')
+                            ->schema([
+                                TextEntry::make('item.name')
+                                    ->label('Product')
+                                    ->size('sm')
+                                    ->weight('bold')
+                                    ->icon('heroicon-o-cube'),
+                                TextEntry::make('item.category') // Ubah dari sku ke category
+                                    ->label('Kategori')
+                                    ->badge()
+                                    ->color('gray')
+                                    ->icon('heroicon-o-tag'),
+                                TextEntry::make('item.price')
+                                    ->label('Unit Price')
+                                    ->money('IDR')
+                                    ->color('primary')
+                                    ->icon('heroicon-o-currency-dollar'),
+                                TextEntry::make('item.status')
+                                    ->label('Status')
+                                    ->badge(),
+                            ])
+                            ->collapsible()
+                            ->columns(2),
+                        Section::make('Stock Details')
+                            ->icon('heroicon-o-chart-bar')
+                            ->schema([
+                                TextEntry::make('quantity')
+                                    ->label('Current Stock')
+                                    ->size('lg')
+                                    ->weight('bold')
+                                    ->badge()
+                                    ->icon('heroicon-o-archive-box')
+                                    ->color(fn($state): string => match (true) {
+                                        $state <= 0 => 'danger',
+                                        $state <= 10 => 'warning',
+                                        default => 'success',
+                                    }),
+                                TextEntry::make('stock_value')
+                                    ->label('Total Value')
+                                    ->size('lg')
+                                    ->weight('bold')
+                                    ->getStateUsing(fn($record): float => $record->quantity * $record->item->price)
+                                    ->money('IDR')
+                                    ->color('success')
+                                    ->icon('heroicon-o-banknotes'),
+                            ])
+                            ->collapsible()
+                            ->columns(2),
+                    ]),
+                
+                // INI BAGIAN EDIT ACTION YANG BARU
+                EditAction::make()
+                    ->modalHeading('Update Stock')
+                    ->modalDescription('Sesuaikan jumlah stok untuk produk atau varian ini.')
+                    ->modalIcon('heroicon-o-archive-box')
+                    ->schema([
+                        TextInput::make('display_name')
+                            ->label('Product / Varian')
+                            ->disabled()
+                            ->formatStateUsing(function ($record) {
+                                $name = ucfirst((string) $record->item->name);
+                                if ($record->variant_option_id) {
+                                    $variant = VariantOption::find($record->variant_option_id);
+                                    if ($variant) {
+                                        $name .= ' (' . $variant->name . ')';
+                                    }
+                                }
+                                return $name;
+                            }),
+
+                        TextInput::make('quantity')
+                            ->label('Current Quantity')
+                            ->numeric()
+                            ->minValue(0)
+                            ->required()
+                            ->prefixIcon('heroicon-o-hashtag')
+                            ->hint('Timpa dengan angka stok fisik yang terbaru'),
+                    ]),
+                
+                DeleteAction::make(),
+            ])            
             ->toolbarActions([
                 BulkActionGroup::make([
 
