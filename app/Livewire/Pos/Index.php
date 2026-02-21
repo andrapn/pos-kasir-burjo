@@ -75,7 +75,6 @@ final class Index extends Component implements HasActions, HasSchemas
     {
         if (isset($this->cart[$index])) {
             unset($this->cart[$index]);
-            $this->cart = array_values($this->cart);
         }
     }
     #[Computed]
@@ -223,7 +222,6 @@ final class Index extends Component implements HasActions, HasSchemas
     {
         if (isset($this->cart[$index])) {
             unset($this->cart[$index]);
-            $this->cart = array_values($this->cart);
         }
     }
 

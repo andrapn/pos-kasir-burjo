@@ -176,7 +176,7 @@
                             <div class="flex items-center gap-2 mt-2">
                                 <div class="flex items-center bg-zinc-100 dark:bg-zinc-700 rounded-lg">
                                     <button
-                                        wire:click="decrementQuantity({{ $index }})"
+                                        wire:click="decrementQuantity('{{ $index }}')"
                                         class="size-7 flex items-center justify-center text-zinc-600 dark:text-zinc-300
                                                hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded-l-lg transition-colors"
                                     >
@@ -186,7 +186,7 @@
                                         {{ $cartItem['quantity'] }}
                                     </span>
                                     <button
-                                        wire:click="incrementQuantity({{ $index }})"
+                                        wire:click="incrementQuantity('{{ $index }}')"
                                         class="size-7 flex items-center justify-center text-zinc-600 dark:text-zinc-300
                                                hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded-r-lg transition-colors"
                                     >
@@ -194,7 +194,7 @@
                                     </button>
                                 </div>
                                 <button
-                                    wire:click="removeCart({{ $index }})" 
+                                    wire:click="removeCart('{{ $index }}')"
                                     class="size-7 flex items-center justify-center text-red-500 hover:bg-red-50
                                            dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                 >
