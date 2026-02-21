@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 namespace App\Livewire\Inventory;
-
+use App\Models\Item;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use App\Enums\ItemStatus;
 use App\Models\Inventory;
 use Filament\Actions\BulkActionGroup;
@@ -28,7 +30,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Livewire\Component;
-
+use App\Models\VariantOption;
 final class Index extends Component implements HasActions, HasSchemas, HasTable
 {
     use InteractsWithActions;
@@ -44,8 +46,19 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->sortable()
                     ->weight('bold')
                     ->icon('heroicon-o-cube')
-                    ->description(fn($record): string => "SKU: {$record->item->sku}")
-                    ->formatStateUsing(fn($state): string => ucfirst((string) $state))
+                    // 1. TAMPILKAN NAMA VARIAN JIKA ADA
+                    ->formatStateUsing(function ($record) {
+                        $name = ucfirst((string) $record->item->name);
+                        if ($record->variant_option_id) {
+                            $variant = \App\Models\VariantOption::find($record->variant_option_id);
+                            if ($variant) {
+                                $name .= ' (' . $variant->name . ')';
+                            }
+                        }
+                        return $name;
+                    })
+                    // 2. GANTI SKU JADI CATEGORY BIAR GAK ERROR
+                    ->description(fn($record): string => "Kategori: " . ($record->item->category ?? 'Umum'))
                     ->searchable(),
 
                 TextColumn::make('item.price')
@@ -115,7 +128,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->model(Inventory::class)
                     ->icon('heroicon-o-plus')
                     ->modalHeading('Add New Inventory')
-                    ->modalDescription('Add stock for a product that doesn\'t have inventory yet.')
+                    ->modalDescription('Add stock for a product or its variants.')
                     ->modalIcon('heroicon-o-archive-box')
                     ->schema([
                         Select::make('item_id')
@@ -128,7 +141,44 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->native(false)
                             ->prefixIcon('heroicon-o-cube')
                             ->placeholder('Select a product')
-                            ->noSearchResultsMessage('No products without inventory found'),
+                            ->live() // BIKIN LIVE BIAR BISA TRIGGER VARIAN
+                            ->afterStateUpdated(fn (Set $set) => $set('variant_option_id', null)),
+
+                        // TAMBAHAN DROPDOWN VARIAN DINAMIS
+                        Select::make('variant_option_id')
+                            ->label('Pilih Varian (Wajib)')
+                            ->prefixIcon('heroicon-o-tag')
+                            ->options(function (Get $get) {
+                                $itemId = $get('item_id');
+                                if (!$itemId) return [];
+
+                                $item = Item::with('variantGroups.options')->find($itemId);
+                                if (!$item) return [];
+
+                                $options = [];
+                                foreach ($item->variantGroups as $group) {
+                                    if ($group->track_stock) {
+                                        foreach ($group->options as $opt) {
+                                            $options[$opt->id] = $group->name . ' - ' . $opt->name;
+                                        }
+                                    }
+                                }
+                                return $options;
+                            })
+                            ->visible(function (Get $get) {
+                                $itemId = $get('item_id');
+                                if (!$itemId) return false;
+                                $item = Item::with('variantGroups')->find($itemId);
+                                return $item && $item->variantGroups->where('track_stock', true)->isNotEmpty();
+                            })
+                            ->required(function (Get $get) {
+                                $itemId = $get('item_id');
+                                if (!$itemId) return false;
+                                $item = Item::with('variantGroups')->find($itemId);
+                                return $item && $item->variantGroups->where('track_stock', true)->isNotEmpty();
+                            })
+                            ->searchable()
+                            ->preload(),
 
                         TextInput::make('quantity')
                             ->label('Initial Quantity')
@@ -139,92 +189,6 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->prefixIcon('heroicon-o-hashtag')
                             ->hint('Enter the initial stock quantity'),
                     ]),
-            ])
-            ->recordActions([
-                ViewAction::make()
-                    ->modalHeading('Inventory Details')
-                    ->modalIcon('heroicon-o-archive-box')
-                    ->schema([
-                        Section::make('Product Information')
-                            ->icon('heroicon-o-cube')
-                            ->schema([
-                                TextEntry::make('item.name')
-                                    ->label('Product')
-                                    ->size('sm')
-                                    ->weight('bold')
-                                    ->icon('heroicon-o-cube'),
-                                TextEntry::make('item.sku')
-                                    ->label('SKU')
-                                    ->badge()
-                                    ->color('gray')
-                                    ->icon('heroicon-o-qr-code'),
-                                TextEntry::make('item.price')
-                                    ->label('Unit Price')
-                                    ->money('IDR')
-                                    ->color('primary')
-                                    ->icon('heroicon-o-currency-dollar'),
-                                TextEntry::make('item.status')
-                                    ->label('Status')
-                                    ->badge(),
-                            ])
-                            ->collapsible()
-                            ->columns(2),
-                        Section::make('Stock Details')
-                            ->icon('heroicon-o-chart-bar')
-                            ->schema([
-                                TextEntry::make('quantity')
-                                    ->label('Current Stock')
-                                    ->size('lg')
-                                    ->weight('bold')
-                                    ->badge()
-                                    ->icon('heroicon-o-archive-box')
-                                    ->color(fn($state): string => match (true) {
-                                        $state <= 0 => 'danger',
-                                        $state <= 10 => 'warning',
-                                        default => 'success',
-                                    }),
-                                TextEntry::make('stock_value')
-                                    ->label('Total Value')
-                                    ->size('lg')
-                                    ->weight('bold')
-                                    ->getStateUsing(fn($record): float => $record->quantity * $record->item->price)
-                                    ->money('IDR')
-                                    ->color('success')
-                                    ->icon('heroicon-o-banknotes'),
-                                TextEntry::make('created_at')
-                                    ->label('Added')
-                                    ->dateTime('M d, Y')
-                                    ->icon('heroicon-o-calendar'),
-                                TextEntry::make('updated_at')
-                                    ->label('Last Updated')
-                                    ->dateTime('M d, Y H:i')
-                                    ->icon('heroicon-o-clock'),
-                            ])
-                            ->collapsible()
-                            ->columns(2),
-                    ]),
-                EditAction::make()
-                    ->modalHeading('Update Stock')
-                    ->modalDescription('Adjust the inventory quantity for this product.')
-                    ->modalIcon('heroicon-o-archive-box')
-                    ->schema([
-                        Select::make('item_id')
-                            ->label('Product')
-                            ->relationship('item', 'name')
-                            ->disabled()
-                            ->dehydrated()
-                            ->native(false)
-                            ->prefixIcon('heroicon-o-cube'),
-
-                        TextInput::make('quantity')
-                            ->label('Quantity')
-                            ->numeric()
-                            ->minValue(0)
-                            ->required()
-                            ->prefixIcon('heroicon-o-hashtag')
-                            ->hint('Enter the current stock level'),
-                    ]),
-                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

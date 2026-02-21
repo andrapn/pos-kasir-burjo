@@ -74,7 +74,7 @@
                             <h3 class="font-medium text-sm text-zinc-900 dark:text-white line-clamp-2 leading-tight pr-3">
                                 {{ $item['name'] }}
                             </h3>
-                            <p class="text-[10px] text-zinc-400 font-mono mt-0.5">{{ $item['sku'] }}</p>
+                            <p class="text-[10px] text-zinc-400 font-mono mt-0.5">{{ $item['category'] ?? 'Tanpa Kategori' }}</p>
                             
                             {{-- Spacer biar harga & stok selalu terdorong ke paling bawah --}}
                             <div class="flex-1 min-h-[1.5rem]"></div>

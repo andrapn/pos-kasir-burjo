@@ -37,6 +37,7 @@ final class Inventory extends Model
     protected $fillable = [
         'item_id',
         'quantity',
+        'variant_option_id',
     ];
 
     public function item(): BelongsTo
