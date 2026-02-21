@@ -355,7 +355,7 @@ final class Index extends Component implements HasActions, HasSchemas
         $this->paymentMethodId = null;
 
         Notification::make()
-            ->title('Order Held!')
+            ->title('Pesanan Disimpan!')
             ->body('Pesanan atas nama ' . $customerName . ' berhasil ditahan.')
             ->success()
             ->send();
@@ -439,7 +439,7 @@ final class Index extends Component implements HasActions, HasSchemas
         if ($this->cart === []) {
             Notification::make()
                 ->title('Failed Sale!')
-                ->body('Please add items to cart before checkout.')
+                ->body('Harap tambahkan barang ke keranjang sebelum melakukan pembayaran.')
                 ->danger()
                 ->send();
 
@@ -449,7 +449,7 @@ final class Index extends Component implements HasActions, HasSchemas
         if ( ! $this->paymentMethodId) {
             Notification::make()
                 ->title('Failed Sale!')
-                ->body('Please select a payment method.')
+                ->body('Silakan pilih metode pembayaran')
                 ->danger()
                 ->send();
 
@@ -459,7 +459,7 @@ final class Index extends Component implements HasActions, HasSchemas
         if ($this->paidAmount < $this->total) {
             Notification::make()
                 ->title('Failed Sale!')
-                ->body('Insufficient payment amount.')
+                ->body('Jumlah pembayaran tidak mencukupi.')
                 ->danger()
                 ->send();
 

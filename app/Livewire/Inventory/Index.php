@@ -64,14 +64,14 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->searchable(),
 
                 TextColumn::make('item.price')
-                    ->label('Unit Price')
+                    ->label('Harga Unit')
                     ->money()
                     ->color('info')
                     ->sortable()
                     ->alignLeft(),
 
                 TextColumn::make('quantity')
-                    ->label('Stock')
+                    ->label('Stok')
                     ->sortable()
                     ->badge()
                     ->color(fn($state): string => match (true) {
@@ -82,7 +82,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->alignCenter(),
 
                 TextColumn::make('stock_value')
-                    ->label('Stock Value')
+                    ->label('Nilai Stok')
                     ->getStateUsing(fn($record): float => $record->quantity * $record->item->price)
                     ->money('IDR')
                     ->color('success')
@@ -126,7 +126,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->label('Create Item')
+                    ->label('Buat Item')
                     ->model(Inventory::class)
                     ->icon('heroicon-o-plus')
                     ->modalHeading('Add New Inventory')

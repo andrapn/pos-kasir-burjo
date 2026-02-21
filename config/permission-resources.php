@@ -60,7 +60,7 @@ return [
     ],
 
     'payment-methods' => [
-        'label' => 'Payment Methods',
+        'label' => 'Metode Pembayaran',
         'icon' => 'heroicon-o-credit-card',
         'permissions' => [
             'view',

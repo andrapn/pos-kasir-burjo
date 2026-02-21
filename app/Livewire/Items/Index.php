@@ -41,24 +41,25 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
             ->query(fn(): Builder => Item::query()->with(['inventories', 'variantGroups']))
             ->columns([
                 TextColumn::make('name')
+                    ->label('Nama Produk')
                     ->weight('bold')
                     ->icon('heroicon-o-cube')
                     ->searchable(),
                 TextColumn::make('variantGroups.name')
-                    ->label('Group Varian')
+                    ->label('Grup Varian')
                     ->badge() 
                     ->limitList(3) // Maksimal nampilin 2 badge aja
                     ->expandableLimitedList() // Bisa diklik "+X lainnya" untuk lihat sisanya
                     ->wrap() // Paksa teks turun ke bawah biar tombol Edit gak kedorong
                     ->searchable(),
                 TextColumn::make('price')
-                    ->label('Price')
-                    ->money()
+                    ->label('Harga')
+                    ->money('IDR')
                     ->color('success')
                     ->weight('bold'),
 
                 TextColumn::make('total_stock')
-                    ->label('Stock')
+                    ->label('Stok')
                     ->getStateUsing(fn($record) => $record->inventories->sum('quantity'))
                     ->badge()
                     ->color(fn($state): string => match (true) {
@@ -69,7 +70,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->alignCenter(),
 
                 TextColumn::make('sales_items_count')
-                    ->label('Sold')
+                    ->label('Terjual')
                     ->counts('salesItems')
                     ->badge()
                     ->sortable()
@@ -77,7 +78,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->alignCenter(),
 
                 ToggleColumn::make('status')
-                    ->label('Active')
+                    ->label('Status')
                     ->onColor('success')
                     ->offColor('danger')
                     ->alignCenter()
@@ -104,7 +105,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
             ])
             ->headerActions([
                 Action::make('Create')
-                    ->label('Create Item')
+                    ->label('Buat Item')
                     ->url(fn(): string => route('items.create')),
             ])
             ->recordActions([

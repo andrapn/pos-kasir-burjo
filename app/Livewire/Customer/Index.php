@@ -72,7 +72,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
             ])
             ->headerActions([
                 Action::make('Create')
-                    ->label('Create Item')
+                    ->label('Buat Item')
                     ->icon(Heroicon::Plus)
                     ->url(fn(): string => route('customers.create')),
             ])

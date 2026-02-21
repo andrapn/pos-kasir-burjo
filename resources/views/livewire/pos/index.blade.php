@@ -13,7 +13,7 @@
                         {{ now()->format('H:i') }}
                     </flux:badge>
                     <flux:badge color="zinc">
-                        {{ count($this->filteredItems) }} Products
+                        {{ count($this->filteredItems) }} Produk
                     </flux:badge>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                     <flux:input
                         wire:model.live.debounce.300ms="search"
                         icon="magnifying-glass"
-                        placeholder="Search by name, SKU, or barcode..."
+                        placeholder="Cari Berdasarkan Nama..."
                         clearable
                         class="bg-zinc-50 dark:bg-zinc-900"
                     />

@@ -45,36 +45,36 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                     ->icon(fn(string $state): string => match ($state) {
                         'Cash' => 'heroicon-o-banknotes',
                         'Card' => 'heroicon-o-credit-card',
-                        'Mobile Money' => 'heroicon-o-device-phone-mobile',
+                        'Mobile' => 'heroicon-o-device-phone-mobile',
                         'Bank Transfer' => 'heroicon-o-building-library',
                         default => 'heroicon-o-currency-dollar',
                     })
                     ->description(fn(string $state): string => match ($state) {
-                        'Cash' => 'Physical currency payment',
-                        'Card' => 'Credit or debit card',
-                        'Mobile Money' => 'Digital wallet payment',
-                        'Bank Transfer' => 'Direct bank transfer',
+                        'Cash' => 'Pembayaran tunai fisik',
+                        'Card' => 'Kartu kredit atau debit',
+                        'Mobile' => 'Pembayaran dompet digital',
+                        'Bank Transfer' => 'Transfer bank langsung',
                         default => '',
                     }),
                 ToggleColumn::make('is_active')
-                    ->label('Active')
+                    ->label('Aktif')
                     ->onColor('success')
                     ->offColor('danger')
                     ->alignCenter(),
                 TextColumn::make('sales_count')
-                    ->label('Total Sales')
+                    ->label('Total Penjualan')
                     ->counts('sales')
                     ->badge()
                     ->color('info')
                     ->alignCenter(),
                 TextColumn::make('created_at')
-                    ->label('Created')
+                    ->label('Dibuat Pada')
                     ->dateTime('M d, Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('sales_sum_total')
-                    ->label('Revenue')
+                    ->label('Pendapatan')
                     ->sum('sales', 'total')
                     ->money()
                     ->color('success')
@@ -84,7 +84,7 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
             ->recordActions([
                 ViewAction::make()
                     ->modalHeading(fn(PaymentMethod $record): string => $record->name)
-                    ->modalDescription('Payment Method Details')
+                    ->modalDescription('Detail Metode Pembayaran')
                     ->modalIcon(fn(PaymentMethod $record): string => match ($record->name) {
                         'Cash' => 'heroicon-o-banknotes',
                         'Card' => 'heroicon-o-credit-card',
@@ -100,7 +100,7 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                                 Section::make()
                                     ->schema([
                                         TextEntry::make('sales_count')
-                                            ->label('Total Transactions')
+                                            ->label('Total Transaksi')
                                             ->state(fn(PaymentMethod $record): int => $record->sales()->count())
                                             ->icon('heroicon-o-shopping-cart')
                                             ->color('info')
@@ -111,7 +111,7 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                                 Section::make()
                                     ->schema([
                                         TextEntry::make('total_revenue')
-                                            ->label('Total Revenue')
+                                            ->label('Pendapatan Total')
                                             ->state(fn(PaymentMethod $record): string|float => $record->sales()->sum('total'))
                                             ->money()
                                             ->icon('heroicon-o-currency-dollar')
@@ -131,13 +131,13 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                                     ]),
                             ]),
 
-                        Section::make('Payment Method Information')
+                        Section::make('Informasi Metode Pembayaran')
                             ->icon('heroicon-o-information-circle')
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
                                         TextEntry::make('name')
-                                            ->label('Name')
+                                            ->label('Nama')
                                             ->weight(FontWeight::Bold)
                                             ->icon(fn(PaymentMethod $record): string => match ($record->name) {
                                                 'Cash' => 'heroicon-o-banknotes',
@@ -148,32 +148,32 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                                             }),
 
                                         TextEntry::make('type_description')
-                                            ->label('Type')
+                                            ->label('Tipe')
                                             ->state(fn(PaymentMethod $record): string => match ($record->name) {
-                                                'Cash' => 'Physical currency payment',
-                                                'Card' => 'Credit or debit card',
-                                                'Mobile Money' => 'Digital wallet payment',
-                                                'Bank Transfer' => 'Direct bank transfer',
+                                                'Cash' => 'Pembayaran tunai fisik',
+                                                'Card' => 'Kartu kredit atau debit',
+                                                'Mobile' => 'Pembayaran dompet digital',
+                                                'Bank Transfer' => 'Transfer bank langsung ',
                                                 default => 'Other payment method',
                                             })
                                             ->color('gray'),
                                     ]),
                             ]),
 
-                        Section::make('Statistics')
+                        Section::make('Statistik')
                             ->icon('heroicon-o-chart-bar')
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
                                         TextEntry::make('avg_transaction')
-                                            ->label('Average Transaction')
+                                            ->label('Rata-rata Transaksi')
                                             ->state(fn(PaymentMethod $record): float|string => $record->sales()->avg('total') ?? 0)
                                             ->money()
                                             ->icon('heroicon-o-calculator')
                                             ->color('warning'),
 
                                         TextEntry::make('last_used')
-                                            ->label('Last Used')
+                                            ->label('Terakhir Digunakan')
                                             ->state(fn(PaymentMethod $record): string => $record->sales()->latest()->first()?->created_at?->diffForHumans() ?? 'Never')
                                             ->icon('heroicon-o-clock')
                                             ->color('gray'),
@@ -188,12 +188,12 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                                 Grid::make(2)
                                     ->schema([
                                         TextEntry::make('created_at')
-                                            ->label('Created')
+                                            ->label('Dibuat Pada')
                                             ->dateTime('M d, Y - H:i')
                                             ->icon('heroicon-o-calendar'),
 
                                         TextEntry::make('updated_at')
-                                            ->label('Last Updated')
+                                            ->label('Terakhir Diperbarui')
                                             ->since()
                                             ->icon('heroicon-o-arrow-path'),
                                     ]),
@@ -201,12 +201,12 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                     ]),
                 EditAction::make()
                     ->modalHeading(fn(PaymentMethod $record): string => "Edit {$record->name}")
-                    ->modalDescription('Update payment method details')
+                    ->modalDescription('Perbarui detail metode pembayaran')
                     ->modalIcon('heroicon-o-pencil-square')
                     ->modalWidth('2xl')
                     ->schema([
                         TextInput::make('name')
-                            ->label('Payment Method Name')
+                            ->label('Nama Metode Pembayaran')
                             ->required()
                             ->maxLength(20)
                             ->unique(table: PaymentMethod::class, column: 'name', ignoreRecord: true)
@@ -215,7 +215,7 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
 
                         Toggle::make('is_active')
                             ->label('Active')
-                            ->helperText('Inactive payment methods won\'t appear in sales')
+                            ->helperText('Metode pembayaran yang tidak aktif tidak akan muncul dalam penjualan.')
                             ->default(true),
                     ])
                 ,
@@ -229,8 +229,8 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                         false => 'Inactive',
                     ]),
             ])
-            ->emptyStateHeading('No payment methods')
-            ->emptyStateDescription('Create your first payment method to get started.')
+            ->emptyStateHeading('Tidak ada metode pembayaran')
+            ->emptyStateDescription('Buat metode pembayaran pertama Anda untuk memulai.')
             ->emptyStateIcon('heroicon-o-credit-card')
             ->defaultSort('name', 'asc')
             ->striped()
