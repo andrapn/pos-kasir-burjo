@@ -467,49 +467,53 @@ final class Index extends Component implements HasActions, HasSchemas
                 ]);
 
                 foreach ($this->cart as $item) {
+                    // 1. Catat ke history penjualan
                     $sale->salesItems()->create([
                         'item_id' => $item['id'],
                         'quantity' => $item['quantity'],
                         'price' => $item['price'],
                     ]);
 
-                    // --- PERBAIKAN LOGIKA STOK VARIAN ---
+                    $stokVarianBerkurang = false;
+
+                    // 2. Coba potong stok khusus varian (Jika item punya varian dan track_stock-nya aktif)
                     if (!empty($item['variant_ids']) && is_array($item['variant_ids'])) {
-                        // Jika produk ini Master Varian (punya array variant_ids)
                         foreach ($item['variant_ids'] as $vId) {
-                            Inventory::where('item_id', $item['id'])
+                            $inv = Inventory::where('item_id', $item['id'])
                                 ->where('variant_option_id', $vId)
-                                ->decrement('quantity', $item['quantity']);
+                                ->first();
+                            
+                            if ($inv) {
+                                Inventory::where('id', $inv->id)->decrement('quantity', $item['quantity']);
+                                $stokVarianBerkurang = true;
+                            }
                         }
                     } elseif (!empty($item['variant_id'])) {
-                        // Jika varian tunggal lama
-                        Inventory::where('item_id', $item['id'])
+                        // Support untuk format varian tunggal lama
+                        $inv = Inventory::where('item_id', $item['id'])
                             ->where('variant_option_id', $item['variant_id'])
-                            ->decrement('quantity', $item['quantity']);
-                    } else {
-                        if (!empty($item['variant_ids']) && is_array($item['variant_ids'])) {
-                            // Jika produk ini Master Varian
-                            foreach ($item['variant_ids'] as $vId) {
-                                Inventory::where('item_id', $item['id'])
-                                    ->where('variant_option_id', $vId)
-                                    ->decrement('quantity', $item['quantity']);
-                            }
-                        } elseif (!empty($item['variant_id'])) {
-                            // Jika varian tunggal lama
-                            Inventory::where('item_id', $item['id'])
-                                ->where('variant_option_id', $item['variant_id'])
-                                ->decrement('quantity', $item['quantity']);
-                        } else {
-                            // JIKA PRODUK REGULER (TANPA VARIAN)
-                            // 1. Cari dulu ID baris stoknya
-                            $inventory = Inventory::where('item_id', $item['id'])->first();
-                            
-                            if ($inventory) {
-                                // 2. Tembak langsung pakai Query Builder berdasarkan ID-nya
-                                // Ini bakal nge-bypass InventoryObserver secara total
-                                Inventory::where('id', $inventory->id)
-                                    ->decrement('quantity', $item['quantity']);
-                            }
+                            ->first();
+                        
+                        if ($inv) {
+                            Inventory::where('id', $inv->id)->decrement('quantity', $item['quantity']);
+                            $stokVarianBerkurang = true;
+                        }
+                    }
+
+                    // 3. FALLBACK: Jika varian tidak pakai stok (contoh: Level Pedas) ATAU menu ini reguler (contoh: Seafood)
+                    if (!$stokVarianBerkurang) {
+                        // Langsung hajar stok induknya yang variant_option_id-nya kosong
+                        $invParent = Inventory::where('item_id', $item['id'])
+                            ->whereNull('variant_option_id')
+                            ->first();
+                        
+                        // Jaga-jaga kalau data di database formatnya beda, ambil baris pertama yang nempel ke item ini
+                        if (!$invParent) {
+                            $invParent = Inventory::where('item_id', $item['id'])->first();
+                        }
+
+                        if ($invParent) {
+                            Inventory::where('id', $invParent->id)->decrement('quantity', $item['quantity']);
                         }
                     }
                 }
