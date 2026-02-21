@@ -294,7 +294,7 @@
                     @forelse($this->lowStockList as $inventory)
                         <div class="px-6 py-3 flex items-center justify-between">
                             <span class="text-sm text-zinc-900 dark:text-white truncate max-w-[140px]">
-                                {{ $inventory->item->name }}
+                                {{ $inventory['item']['name'] }}
                             </span>
                             @php
                                 $stockColor = match(true) {
@@ -304,7 +304,7 @@
                                 };
                             @endphp
                             <flux:badge size="sm" :color="$stockColor">
-                                {{ $inventory->quantity }} left
+                                {{ $inventory['quantity'] }} left
                             </flux:badge>
                         </div>
                     @empty
