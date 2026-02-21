@@ -105,8 +105,6 @@ final class Index extends Component
                 DB::raw('SUM(sales_items.quantity) as total_sold')
             )
             ->whereMonth('sales_items.created_at', now()->month)
-            // 👇 FIX UNTUK POSTGRESQL 👇
-            // Kita pakai groupByRaw dan jabarkan fungsinya secara utuh
             ->groupByRaw('COALESCE(sales_items.item_name, items.name)') 
             ->orderByDesc('total_sold')
             ->take(5)
@@ -116,15 +114,13 @@ final class Index extends Component
     #[Computed]
     public function lowStockList(): array
     {
-        return Inventory::with('item:id,name,low_stock_threshold') // Ambil relasi item sekalian
+        return Inventory::with('item:id,name,low_stock_threshold')
             ->get()
             ->filter(function ($inventory) {
-                // Saring jika stok <= batas minimum dari item induk (default 10 kalau kosong)
                 $threshold = $inventory->item->low_stock_threshold ?? 10;
                 return $inventory->quantity <= $threshold && $inventory->quantity > 0;
             })
             ->map(function ($inventory) {
-                // Format nama biar variannya ikutan mejeng
                 $name = ucfirst((string) $inventory->item->name);
                 
                 if ($inventory->variant_option_id) {
@@ -135,14 +131,14 @@ final class Index extends Component
                 }
 
                 return [
-                    'id' => $inventory->id, // Bawa ID buat jaga-jaga kalau dibutuhin di blade
+                    'id' => $inventory->id,
                     'item' => [
-                        'name' => $name, // Nama yang udah digabung sama varian
+                        'name' => $name, 
                     ],
                     'quantity' => $inventory->quantity,
                 ];
             })
-            ->sortBy('quantity') // Urutkan dari stok yang paling kritis
+            ->sortBy('quantity')
             ->values()
             ->toArray();
     }
@@ -152,8 +148,6 @@ final class Index extends Component
     {
         $days = collect(range(6, 0))->map(function ($daysAgo): array {
             $date = now()->subDays($daysAgo);
-            
-            // Bikin kamus translate hari
             $namaHari = [
                 'Sun' => 'Min',
                 'Mon' => 'Sen',
@@ -165,7 +159,6 @@ final class Index extends Component
             ];
 
             return [
-                // Panggil kamusnya berdasarkan format 'D' (Sun, Mon, dst)
                 'label' => $namaHari[$date->format('D')], 
                 'date' => $date->toDateString(),
                 'total' => Sale::whereDate('created_at', $date)->sum('total'),

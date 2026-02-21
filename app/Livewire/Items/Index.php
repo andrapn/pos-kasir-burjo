@@ -47,10 +47,11 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->searchable(),
                 TextColumn::make('variantGroups.name')
                     ->label('Grup Varian')
-                    ->badge() 
-                    ->limitList(3) // Maksimal nampilin 2 badge aja
-                    ->expandableLimitedList() // Bisa diklik "+X lainnya" untuk lihat sisanya
-                    ->wrap() // Paksa teks turun ke bawah biar tombol Edit gak kedorong
+                    ->badge()
+                    ->listWithLineBreaks()
+                    ->limitList(3) 
+                    ->expandableLimitedList() 
+                    ->wrap()
                     ->searchable(),
                 TextColumn::make('price')
                     ->label('Harga')
@@ -163,7 +164,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                 TextEntry::make('stock_value')
                                     ->label('Stock Value')
                                     ->state(fn($record): float => $record->inventories->sum('quantity') * (float) $record->price)
-                                    ->money('IDR') // Pastikan ada format mata uangnya
+                                    ->money('IDR')
                                     ->size('lg')
                                     ->weight('bold')
                                     ->color('warning')

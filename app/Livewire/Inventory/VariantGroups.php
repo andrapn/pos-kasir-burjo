@@ -24,7 +24,6 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
     use InteractsWithForms;
     use InteractsWithTable;
     use InteractsWithActions;
-
     public ?array $data = [];
     public $editingId = null;
 
@@ -36,7 +35,6 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
     public function table(Table $table): Table
     {
         return $table
-            // 👇 FIX LEMOT: Tambahkan with('options') agar database cuma ditarik 1 kali
             ->query(VariantGroup::query()->with('options'))
             ->columns([
                 TextColumn::make('name')
@@ -51,12 +49,10 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 TextColumn::make('options.name')
                     ->label('Daftar Opsi')
                     ->badge()
-                    // 👇 FIX OFFSIDE: Lipat opsi yang kepanjangan
-                    ->limitList(3) // Maksimal tampilkan 3 badge
-                    ->expandableLimitedList() // Sisanya disembunyikan jadi tombol
-                    ->wrap(), // Jaga-jaga paksa turun ke baris baru kalau layar sempit
-                
-                // Kolom aksi custom kamu
+                    ->listWithLineBreaks()
+                    ->limitList(3)
+                    ->expandableLimitedList()
+                    ->wrap(),
                 TextColumn::make('id')
                     ->label('Aksi')
                     ->view('livewire.inventory.table-actions'),
@@ -66,7 +62,7 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components([ // <-- Ubah dari ->schema(...) jadi ->components(...)
+            ->components([
                 TextInput::make('name')
                     ->label('Judul Varian')
                     ->placeholder('Cth: Rasa Nutrisari, Level Pedas')
@@ -84,15 +80,13 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                     ->columns(1)
                     ->addActionLabel('Tambah Pilihan'),
             ])
-            ->statePath('data'); // Wajib ada untuk form custom
+            ->statePath('data');
     }
 
     public function openCreate(): void
     {
         $this->form->fill();
         $this->editingId = null;
-        
-        // 👇 TAMBAHKAN BARIS INI
         $this->dispatch('open-variant-modal'); 
     }
 
@@ -108,8 +102,6 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 'options' => $group->options->toArray(),
             ]);
         }
-        
-        // 👇 TAMBAHKAN BARIS INI JUGA
         $this->dispatch('open-variant-modal'); 
     }
 
@@ -144,7 +136,7 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
 
         $this->form->fill();
         $this->editingId = null;
-        $this->dispatch('close-variant-modal'); // Memicu penutupan modal Flux
+        $this->dispatch('close-variant-modal');
     }
 
     public function render(): View
