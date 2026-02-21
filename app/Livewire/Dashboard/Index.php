@@ -42,7 +42,7 @@ final class Index extends Component
     #[Computed]
     public function lowStockItems(): int
     {
-        return Inventory::where('quantity', '<=', 10)
+        return Inventory::where('quantity', '<=', 5)
             ->where('quantity', '>', 0)
             ->count();
     }

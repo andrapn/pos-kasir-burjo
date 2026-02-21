@@ -243,6 +243,65 @@ final class Index extends Component implements HasActions, HasSchemas
     public function incrementQuantity($index): void
     {
         if (isset($this->cart[$index])) {
+            $cartItem = $this->cart[$index];
+            $itemId = $cartItem['id'];
+            $currentQty = $cartItem['quantity'];
+
+            $isStockSufficient = true;
+            $maxStock = 0;
+            $stokVarianBerkurang = false;
+            if (!empty($cartItem['variant_ids']) && is_array($cartItem['variant_ids'])) {
+                foreach ($cartItem['variant_ids'] as $vId) {
+                    $inv = Inventory::where('item_id', $itemId)
+                                    ->where('variant_option_id', $vId)
+                                    ->first();
+                    if ($inv) {
+                        $stokVarianBerkurang = true;
+                        if ($currentQty >= $inv->quantity) {
+                            $isStockSufficient = false;
+                            $maxStock = $inv->quantity;
+                            break;
+                        }
+                    }
+                }
+            } elseif (!empty($cartItem['variant_id'])) {
+                $inv = Inventory::where('item_id', $itemId)
+                                ->where('variant_option_id', $cartItem['variant_id'])
+                                ->first();
+                if ($inv) {
+                    $stokVarianBerkurang = true;
+                    if ($currentQty >= $inv->quantity) {
+                        $isStockSufficient = false;
+                        $maxStock = $inv->quantity;
+                    }
+                }
+            }
+
+            // 3. Jika varian tidak punya stok sendiri (misal: Level Pedas) ATAU ini menu reguler,
+            // maka cek sisa stok menu induknya
+            if (!$stokVarianBerkurang) {
+                $invParent = Inventory::where('item_id', $itemId)
+                                      ->whereNull('variant_option_id')
+                                      ->first();
+                if (!$invParent) {
+                    $invParent = Inventory::where('item_id', $itemId)->first();
+                }
+                if ($invParent && $currentQty >= $invParent->quantity) {
+                    $isStockSufficient = false;
+                    $maxStock = $invParent->quantity;
+                }
+            }
+
+            // Tampilkan Alert & Tolak Penambahan jika stok nggak cukup
+            if (!$isStockSufficient) {
+                Notification::make()
+                    ->title('Stok Habis!')
+                    ->body("Sisa maksimal yang bisa dibeli hanya {$maxStock}.")
+                    ->warning()
+                    ->send();
+                return; 
+            }
+
             $this->cart[$index]['quantity']++;
         }
     }
@@ -469,6 +528,47 @@ final class Index extends Component implements HasActions, HasSchemas
     private function processAddToCart($item, $variant = null): void
     {
         $cartKey = $variant ? $item->id . '-' . $variant->id : (string) $item->id;
+        $currentQty = $this->cart[$cartKey]['quantity'] ?? 0;
+
+        $isStockSufficient = true;
+        $maxStock = 0;
+        $stokVarianBerkurang = false;
+
+        if ($variant) {
+            $inv = Inventory::where('item_id', $item->id)
+                            ->where('variant_option_id', $variant->id)
+                            ->first();
+            if ($inv) {
+                $stokVarianBerkurang = true;
+                if ($currentQty >= $inv->quantity) {
+                    $isStockSufficient = false;
+                    $maxStock = $inv->quantity;
+                }
+            }
+        }
+
+        if (!$stokVarianBerkurang) {
+            $invParent = Inventory::where('item_id', $item->id)
+                                  ->whereNull('variant_option_id')
+                                  ->first();
+            if (!$invParent) {
+                $invParent = Inventory::where('item_id', $item->id)->first();
+            }
+            if ($invParent && $currentQty >= $invParent->quantity) {
+                $isStockSufficient = false;
+                $maxStock = $invParent->quantity;
+            }
+        }
+
+        if (!$isStockSufficient) {
+            Notification::make()
+                ->title('Stok Habis!')
+                ->body("Sisa stok {$item->name} hanya {$maxStock}.")
+                ->warning()
+                ->send();
+            return;
+        }
+
         if (isset($this->cart[$cartKey])) {
             $this->cart[$cartKey]['quantity']++;
         } else {
