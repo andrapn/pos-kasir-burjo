@@ -135,13 +135,14 @@ final class Index extends Component implements HasActions, HasSchemas
     #[Computed]
     public function total(): float
     {
-        return $this->totalBeforeDiscount - $this->discountAmount;
+        $calculatedTotal = $this->subtotal - (float) $this->discountAmount;
+        return $calculatedTotal > 0 ? $calculatedTotal : 0;
     }
 
     #[Computed]
     public function change(): int|float
     {
-        return max(0, $this->paidAmount - $this->total);
+        return $this->paidAmount - $this->total;
     }
 
     public function addToCart(int $itemId): void
