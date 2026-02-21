@@ -517,7 +517,5 @@ final class Index extends Component implements HasActions, HasSchemas
                 'quantity' => 1,
             ];
         }
-
-        $this->calculateTotals();
     }
 }

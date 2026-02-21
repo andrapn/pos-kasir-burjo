@@ -50,10 +50,10 @@ final class Item extends Model
 
     protected $fillable = [
         'name',
-        'sku',
         'price',
         'status',
         'low_stock_threshold',
+        'category',
     ];
 
     public function inventory(): HasOne

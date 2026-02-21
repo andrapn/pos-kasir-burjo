@@ -37,117 +37,26 @@ final class Create extends Component implements HasActions, HasSchemas
     {
         return $schema
             ->components([
-                Section::make('Basic Information')
-                    ->description('Customer name and company details')
-                    ->icon('heroicon-o-user')
+                Section::make('Informasi Pelanggan')
+                    ->description('Masukkan nama untuk antrean. Nomor HP opsional.')
+                    ->icon('heroicon-o-users')
                     ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('name')
-                                    ->label('Full Name')
-                                    ->required()
-                                    ->minLength(2)
-                                    ->maxLength(255)
-                                    ->placeholder('John Doe')
-                                    ->autofocus(),
-
-                                TextInput::make('company_name')
-                                    ->label('Company Name')
-                                    ->maxLength(255)
-                                    ->placeholder('Acme Inc.'),
-                            ]),
-
-                        TextInput::make('tax_id')
-                            ->label('Tax ID / VAT Number')
-                            ->maxLength(50)
-                            ->unique(Customer::class, 'tax_id')
-                            ->placeholder('TR1234567890'),
-                    ]),
-
-                Section::make('Contact Information')
-                    ->description('Email and phone details')
-                    ->icon('heroicon-o-phone')
-                    ->schema([
-                        Grid::make(2)
-                            ->schema([
-                                TextInput::make('email')
-                                    ->label('Email Address')
-                                    ->email()
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->unique(Customer::class, 'email')
-                                    ->placeholder('john@example.com')
-                                    ->prefixIcon('heroicon-o-envelope'),
-
-                                TextInput::make('phone')
-                                    ->label('Phone Number')
-                                    ->tel()
-                                    ->maxLength(20)
-                                    ->regex('/^[\+]?[(]?\d{3}[)]?[-\s\.]?\d{3}[-\s\.]?\d{4,6}$/')
-                                    ->validationMessages([
-                                        'regex' => 'Please enter a valid phone number.',
-                                    ])
-                                    ->placeholder('+90 555 123 4567')
-                                    ->prefixIcon('heroicon-o-phone'),
-                            ]),
-                    ]),
-
-                Section::make('Address')
-                    ->description('Billing and shipping address')
-                    ->icon('heroicon-o-map-pin')
-                    ->collapsible()
-                    ->schema([
-                        TextInput::make('address')
-                            ->label('Street Address')
+                        TextInput::make('name')
+                            ->label('Nama Pelanggan')
+                            ->required()
+                            ->minLength(2)
                             ->maxLength(255)
-                            ->placeholder('123 Main Street')
-                            ->columnSpanFull(),
+                            ->placeholder('Cth: Mas Budi')
+                            ->autofocus(),
 
-                        Grid::make(3)
-                            ->schema([
-                                TextInput::make('city')
-                                    ->label('City')
-                                    ->maxLength(100)
-                                    ->alpha()
-                                    ->placeholder('Istanbul'),
-
-                                TextInput::make('state')
-                                    ->label('State / Province')
-                                    ->maxLength(100)
-
-                                    ->placeholder('Marmara'),
-
-                                TextInput::make('postal_code')
-                                    ->label('Postal Code')
-                                    ->maxLength(20)
-                                    ->numeric()
-                                    ->placeholder('34000'),
-                            ]),
-
-                        TextInput::make('country')
-                            ->label('Country')
-                            ->maxLength(100)
-                            ->alpha()
-                            ->placeholder('Turkey'),
-                    ]),
-
-                Section::make('Additional Information')
-                    ->icon('heroicon-o-document-text')
-                    ->collapsible()
-                    ->collapsed()
-                    ->schema([
-                        Textarea::make('notes')
-                            ->label('Notes')
-                            ->rows(3)
-                            ->maxLength(1000)
-                            ->placeholder('Any additional notes about this customer...')
-                            ->columnSpanFull(),
-
-                        Toggle::make('is_active')
-                            ->label('Active Customer')
-                            ->helperText('Inactive customers won\'t appear in sales selection')
-                            ->default(true),
-                    ]),
+                        TextInput::make('phone')
+                            ->label('Nomor HP (Opsional)')
+                            ->tel()
+                            ->maxLength(20)
+                            ->placeholder('Cth: 081234567890')
+                            ->prefixIcon('heroicon-o-phone'),
+                    ])
+                    ->columns(1), // UI lebih clean dengan 1 kolom
             ])
             ->statePath('data')
             ->model(Customer::class);
