@@ -51,6 +51,7 @@ final class Edit extends Component implements HasActions, HasSchemas
                                     ->maxLength(255)
                                     ->autofocus()
                                     ->columnSpan(1),
+
                                 Select::make('category')
                                     ->label('Kategori')
                                     ->options([
@@ -74,10 +75,11 @@ final class Edit extends Component implements HasActions, HasSchemas
                                     ->placeholder('0.00')
                                     ->required()
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix('Rp')
                                     ->minValue(0)
                                     ->step(0.01)
                                     ->columnSpan(1),
+
                                 Select::make('status')
                                     ->label('Status')
                                     ->options(ItemStatus::class)
@@ -95,19 +97,13 @@ final class Edit extends Component implements HasActions, HasSchemas
     {
         $data = $this->form->getState();
 
-        /* if ( ! $this->record->isDirty()) {
-             Notification::make()
-                 ->title('No changes')
-                 ->info()
-                 ->send();
-
-             return;
-         }*/
-
         $this->record->update($data);
 
+        // Ekstra pengaman biar pas Edit juga tetap nge-save/update varian terbaru
+        $this->form->model($this->record)->saveRelationships();
+
         Notification::make()
-            ->title('Item updated..')
+            ->title('Item updated')
             ->body("The {$data['name']} has been updated successfully.")
             ->success()
             ->send();

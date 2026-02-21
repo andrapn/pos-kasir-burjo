@@ -75,29 +75,32 @@ final class Create extends Component implements HasActions, HasSchemas
                                     ->placeholder('0.00')
                                     ->required()
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix('Rp')
                                     ->minValue(0)
                                     ->step(0.01)
                                     ->columnSpan(1),
+
                                 Select::make('status')
                                     ->label('Status')
                                     ->options(ItemStatus::class)
                                     ->required()
                                     ->native(false)
                                     ->columnSpan(1),
-                            ])
-                            ->model(Item::class)
-                            ->statePath('data'),
+                            ]),
                     ]),
-            ]);
+            ])
+            // DEKLARASI MODEL & STATEPATH BERADA DI LUAR COMPONENTS
+            ->statePath('data')
+            ->model(Item::class);
     }
 
     public function create(): void
     {
-        $data = $this->form->getState()['data'];
+        $data = $this->form->getState();
 
         $record = Item::create($data);
 
+        // Kunci utamanya ada di baris ini: Menyimpan relasi varian
         $this->form->model($record)->saveRelationships();
 
         Notification::make()
