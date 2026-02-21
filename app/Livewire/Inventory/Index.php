@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Inventory;
 use App\Models\Item;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use App\Enums\ItemStatus;
 use App\Models\Inventory;
 use Filament\Actions\BulkActionGroup;
