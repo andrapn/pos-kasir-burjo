@@ -456,6 +456,11 @@ final class Index extends Component implements HasActions, HasSchemas
                     'total' => $this->total,
                     'paid_amount' => $this->paidAmount,
                     'discount' => $this->discountAmount,
+                    
+                    // ⚠️ CATATAN PENTING:
+                    // Kalau di tabel 'sales' kamu ada kolom 'user_id' (untuk tahu kasir siapa yang melayani),
+                    // kamu WAJIB ngebuka komentar baris di bawah ini:
+                    // 'user_id' => auth()->id(), 
                 ]);
 
                 foreach ($this->cart as $item) {
@@ -465,33 +470,51 @@ final class Index extends Component implements HasActions, HasSchemas
                         'price' => $item['price'],
                     ]);
 
-                    Inventory::where('item_id', $item['id'])
-                        ->decrement('quantity', $item['quantity']);
+                    // --- PERBAIKAN LOGIKA STOK VARIAN ---
+                    if (!empty($item['variant_ids']) && is_array($item['variant_ids'])) {
+                        // Jika produk ini Master Varian (punya array variant_ids)
+                        foreach ($item['variant_ids'] as $vId) {
+                            Inventory::where('item_id', $item['id'])
+                                ->where('variant_option_id', $vId)
+                                ->decrement('quantity', $item['quantity']);
+                        }
+                    } elseif (!empty($item['variant_id'])) {
+                        // Jika varian tunggal
+                        Inventory::where('item_id', $item['id'])
+                            ->where('variant_option_id', $item['variant_id'])
+                            ->decrement('quantity', $item['quantity']);
+                    } else {
+                        // Jika produk reguler tanpa varian
+                        Inventory::where('item_id', $item['id'])
+                            ->whereNull('variant_option_id')
+                            ->decrement('quantity', $item['quantity']);
+                    }
                 }
             });
 
             Notification::make()
                 ->title('Sale Completed!')
-                ->body('Change: $' . number_format($this->change, 2))
+                ->body('Change: ' . \Illuminate\Support\Number::currency($this->change, 'IDR'))
                 ->success()
                 ->send();
 
-
-            $this->cart = [];
+            // Panggil fungsi bawaan untuk mereset layar kasir
+            $this->clearCart();
             $this->search = '';
             $this->customerSearch = '';
             $this->customerId = null;
             $this->paymentMethodId = null;
-            $this->paidAmount = 0;
-            $this->discountAmount = 0;
 
         } catch (Exception $e) {
             report($e);
 
+            // --- PERBAIKAN PESAN ERROR ---
+            // Kita keluarkan $e->getMessage() agar kamu tahu persis apa penyebab aplikasinya gagal
             Notification::make()
                 ->title('Sale Failed!')
-                ->body('An error occurred. Please try again.')
+                ->body('Penyebab Error: ' . $e->getMessage())
                 ->danger()
+                ->persistent() // Biar notifikasinya gak cepet hilang
                 ->send();
         }
     }
