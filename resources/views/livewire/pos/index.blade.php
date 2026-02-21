@@ -534,7 +534,7 @@
                     <div class="flex justify-between items-center p-3 rounded-xl mb-3
                                 {{ $this->change >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/20' : 'bg-red-50 dark:bg-red-900/20' }}">
                         <span class="font-medium {{ $this->change >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400' }}">
-                            {{ $this->change >= 0 ? 'Change' : 'Amount Due' }}
+                            {{ $this->change >= 0 ? 'Change' : 'Jumlah yang Harus Dibayar' }}
                         </span>
                         <span class="text-xl font-bold {{ $this->change >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }}">
                             {{ \Illuminate\Support\Number::currency(abs($this->change), 'IDR') }}
