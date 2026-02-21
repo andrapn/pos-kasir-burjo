@@ -155,7 +155,7 @@ final class ListUsers extends Component implements HasActions, HasSchemas, HasTa
                                 ->grow(false),
                         ])->from('sm'),
 
-                        Section::make('Roles & Permissions')
+                        Section::make('Peran & Izin')
                             ->icon('heroicon-m-shield-check')
                             ->schema([
                                 TextEntry::make('roles.name')

@@ -132,7 +132,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->schema([
                                 TextEntry::make('price')
                                     ->label('Unit Price')
-                                    ->money()
+                                    ->money('IDR')
                                     ->size('lg')
                                     ->weight('bold')
                                     ->color('success')

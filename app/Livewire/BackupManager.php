@@ -81,18 +81,18 @@ final class BackupManager extends Component implements HasActions, HasForms, Has
 
             ->headerActions([
                 Action::make('create')
-                    ->label('Create Backup')
+                    ->label('Buat Pencadangan')
                     ->icon('heroicon-o-circle-stack')
                     ->color('primary')
                     ->requiresConfirmation()
-                    ->modalHeading('Create Database Backup')
-                    ->modalDescription('This will create a backup of your database. Are you sure?')
+                    ->modalHeading('Buat Pencadangan Database')
+                    ->modalDescription('Ini akan membuat cadangan database Anda. Apakah Anda yakin?')
                     ->action(fn() => $this->createBackup()),
             ])
             ->paginated(false)
             ->records(fn(): Collection => $this->getBackups())
-            ->emptyStateHeading('No backups found')
-            ->emptyStateDescription('Create your first backup by clicking the button above.')
+            ->emptyStateHeading('Tidak ada pencadangan ditemukan')
+            ->emptyStateDescription('Buat pencadangan pertama Anda dengan mengklik tombol di atas.')
             ->emptyStateIcon('heroicon-o-circle-stack');
     }
 
@@ -103,8 +103,8 @@ final class BackupManager extends Component implements HasActions, HasForms, Has
             $output = Artisan::output();
 
             Notification::make()
-                ->title('Backup Created Successfully')
-                ->body('Your database backup has been created.')
+                ->title('Pencadangan Dibuat Berhasil')
+                ->body('Cadangan database Anda telah berhasil dibuat.')
                 ->success()
                 ->send();
 
@@ -114,7 +114,7 @@ final class BackupManager extends Component implements HasActions, HasForms, Has
 
         } catch (Exception $e) {
             Notification::make()
-                ->title('Backup Failed')
+                ->title('Pencadangan Gagal')
                 ->body($e->getMessage())
                 ->danger()
                 ->send();
@@ -130,8 +130,8 @@ final class BackupManager extends Component implements HasActions, HasForms, Has
 
         if ( ! $disk->exists($path)) {
             Notification::make()
-                ->title('File Not Found')
-                ->body('The backup file could not be found.')
+                ->title('Berkas Tidak Ditemukan')
+                ->body('Berkas cadangan tidak ditemukan.')
                 ->danger()
                 ->send();
 
@@ -151,14 +151,14 @@ final class BackupManager extends Component implements HasActions, HasForms, Has
             $disk->delete($path);
 
             Notification::make()
-                ->title('Backup Deleted')
-                ->body('The backup has been deleted successfully.')
+                ->title('Pencadangan Dihapus')
+                ->body('Pencadangan telah berhasil dihapus.')
                 ->success()
                 ->send();
         } else {
             Notification::make()
-                ->title('File Not Found')
-                ->body('The backup file could not be found.')
+                ->title('Berkas Tidak Ditemukan')
+                ->body('Berkas cadangan tidak ditemukan.')
                 ->warning()
                 ->send();
         }
@@ -179,8 +179,8 @@ final class BackupManager extends Component implements HasActions, HasForms, Has
         }
 
         Notification::make()
-            ->title('Backups Deleted')
-            ->body("{$count} backup(s) deleted successfully.")
+            ->title('Pencadangan Dihapus')
+            ->body("{$count} pencadangan berhasil dihapus.")
             ->success()
             ->send();
 
@@ -221,20 +221,20 @@ final class BackupManager extends Component implements HasActions, HasForms, Has
             $usedPercent = (($totalSpace - $freeSpace) / $totalSpace) * 100;
 
             if ($usedPercent > 90) {
-                return __('Critical: Disk space is running low (:percent% used). Please free up space or delete old backups.', [
+                return __('Critical: Ruang penyimpanan hampir habis (:percent% used). Harap kosongkan ruang atau hapus cadangan lama.', [
                     'percent' => round($usedPercent, 1),
                 ]);
             }
 
             if ($usedPercent > 80) {
-                return __('Warning: Disk space usage is high (:percent% used). Consider cleaning up old backups.', [
+                return __('Warning: Penggunaan ruang penyimpanan tinggi (:percent% used). Pertimbangkan untuk membersihkan cadangan data lama.', [
                     'percent' => round($usedPercent, 1),
                 ]);
             }
 
             return null;
         } catch (Exception $e) {
-            Log::warning('Failed to check disk space: ' . $e->getMessage());
+            Log::warning('Gagal memeriksa ruang penyimpanan: ' . $e->getMessage());
 
             return null;
         }

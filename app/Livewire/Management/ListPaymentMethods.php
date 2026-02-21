@@ -76,7 +76,7 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                 TextColumn::make('sales_sum_total')
                     ->label('Pendapatan')
                     ->sum('sales', 'total')
-                    ->money()
+                    ->money('IDR')
                     ->color('success')
                     ->weight('bold')
                     ->alignEnd(),
@@ -113,7 +113,7 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                                         TextEntry::make('total_revenue')
                                             ->label('Pendapatan Total')
                                             ->state(fn(PaymentMethod $record): string|float => $record->sales()->sum('total'))
-                                            ->money()
+                                            ->money('IDR')
                                             ->icon('heroicon-o-currency-dollar')
                                             ->color('success')
                                             ->weight(FontWeight::Bold)
@@ -168,7 +168,7 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                                         TextEntry::make('avg_transaction')
                                             ->label('Rata-rata Transaksi')
                                             ->state(fn(PaymentMethod $record): float|string => $record->sales()->avg('total') ?? 0)
-                                            ->money()
+                                            ->money('IDR')
                                             ->icon('heroicon-o-calculator')
                                             ->color('warning'),
 

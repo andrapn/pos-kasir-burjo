@@ -5,10 +5,10 @@
             <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <flux:heading size="xl" class="mb-2">
-                        {{ __('Database Backups') }}
+                        {{ __('Pencadangan Database') }}
                     </flux:heading>
                     <flux:subheading>
-                        {{ __('Manage your database backups. Create, download, and delete backups as needed.') }}
+                        {{ __('Kelola cadangan Database Anda. Buat, unduh, dan hapus cadangan sesuai kebutuhan.') }}
                     </flux:subheading>
                 </div>
 
@@ -19,7 +19,7 @@
                             {{ $this->getBackups()->count() }}
                         </div>
                         <div class="text-xs text-zinc-500 dark:text-zinc-400">
-                            {{ __('Total Backups') }}
+                            {{ __('Total Cadangan') }}
                         </div>
                     </div>
                     <flux:separator vertical class="h-12" />
@@ -28,7 +28,7 @@
                             {{ $this->getTotalSize() }}
                         </div>
                         <div class="text-xs text-zinc-500 dark:text-zinc-400">
-                            {{ __('Total Size') }}
+                            {{ __('Total Ukuran') }}
                         </div>
                     </div>
                 </div>
@@ -51,8 +51,8 @@
                         @endif
                         @if($largeBackups->isNotEmpty())
                             <div>
-                                {{ __('You have') }} <strong>{{ $largeBackups->count() }}</strong>
-                                {{ __('large backup(s) (>100 MB). Consider configuring cloud storage for better management.') }}
+                                {{ __('Anda memiliki') }} <strong>{{ $largeBackups->count() }}</strong>
+                                {{ __('Pencadangan besar (>100 MB). Pertimbangkan untuk mengonfigurasi penyimpanan cloud untuk manajemen yang lebih baik.') }}
                             </div>
                         @endif
                     </div>
@@ -65,7 +65,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div class="flex-1 text-sm text-blue-800 dark:text-blue-300">
-                    {{ __('Backups are stored locally. For production, configure S3 or DigitalOcean Spaces in your') }}
+                    {{ __('Pencadangan disimpan secara lokal. Untuk produksi, konfigurasikan S3 atau DigitalOcean Spaces di file') }}
                     <code class="mx-1 rounded bg-blue-100 px-1.5 py-0.5 text-xs dark:bg-blue-900">config/backup.php</code>
                     {{ __('file.') }}
                 </div>
@@ -84,12 +84,12 @@
                     </svg>
                     <div class="flex-1">
                         <div class="mb-1 text-sm font-semibold text-zinc-900 dark:text-white">
-                            {{ __('Backup Tips') }}
+                            {{ __('Tips Pencadangan') }}
                         </div>
                         <div class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
-                            <div>• {{ __('Backups run automatically daily at 2:00 AM') }}</div>
-                            <div>• {{ __('Old backups are automatically cleaned based on retention policy') }}</div>
-                            <div>• {{ __('Download backups before deleting for safekeeping') }}</div>
+                            <div>• {{ __('Pencadangan data berjalan otomatis setiap hari pukul 02.00 pagi.') }}</div>
+                            <div>• {{ __('Cadangan lama akan dibersihkan secara otomatis berdasarkan kebijakan retensi.') }}</div>
+                            <div>• {{ __('Unduh cadangan sebelum menghapus untuk keamanan.') }}</div>
                         </div>
                     </div>
                 </div>

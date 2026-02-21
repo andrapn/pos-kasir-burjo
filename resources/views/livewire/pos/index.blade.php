@@ -1,7 +1,5 @@
 <div class="flex h-[calc(100vh-4rem)]">
-    {{-- Left Panel - Products --}}
     <div class="flex-1 flex flex-col bg-zinc-100 dark:bg-zinc-900">
-        {{-- Top Bar with Categories --}}
         <div class="bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 px-6 py-4">
             <div class="flex items-center justify-between mb-4">
                 <div>
@@ -17,8 +15,6 @@
                     </flux:badge>
                 </div>
             </div>
-
-            {{-- Search & Filter --}}
             <div class="flex items-center gap-3">
                 <div class="flex-1">
                     <flux:input
@@ -44,7 +40,6 @@
                 </button>
             @endforeach
         </div>
-        {{-- Products Grid --}}
         <div class="flex-1 overflow-y-auto p-4">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 @forelse ($this->filteredItems as $item)
@@ -58,7 +53,6 @@
                                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
                                dark:focus:ring-offset-zinc-900 flex flex-col justify-between overflow-hidden"
                     >
-                        {{-- Stock Indicator (Ping Animation) --}}
                         <div class="absolute top-3 right-3 z-10">
                             @if($item['stock'] <= 5)
                                 <span class="flex size-2">
@@ -67,18 +61,12 @@
                                 </span>
                             @endif
                         </div>
-
-                        {{-- Product Info --}}
                         <div class="flex flex-col h-full w-full">
                             <h3 class="font-medium text-sm text-zinc-900 dark:text-white line-clamp-2 leading-tight pr-3">
                                 {{ $item['name'] }}
                             </h3>
                             <p class="text-[10px] text-zinc-400 font-mono mt-0.5">{{ $item['category'] ?? 'Tanpa Kategori' }}</p>
-                            
-                            {{-- Spacer biar harga & stok selalu terdorong ke paling bawah --}}
                             <div class="flex-1 min-h-[1.5rem]"></div>
-
-                            {{-- flex-wrap & gap-1.5 adalah kunci biar nggak offside --}}
                             <div class="flex flex-wrap items-end justify-between gap-1.5 mt-2">
                                 <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">
                                     {{ \Illuminate\Support\Number::currency($item['price'], 'IDR') }}
@@ -91,8 +79,6 @@
                                 </span>
                             </div>
                         </div>
-
-                        {{-- Loading Overlay --}}
                         <div wire:loading wire:target="addToCart({{ $item['id'] }})"
                              class="absolute inset-0 bg-white/80 dark:bg-zinc-800/80 flex items-center justify-center z-20">
                             <flux:icon name="arrow-path" class="size-6 text-indigo-500 animate-spin" />
@@ -109,8 +95,6 @@
                 @endforelse
             </div>
         </div>
-
-        {{-- Quick Actions Bar --}}
         <div class="bg-white dark:bg-zinc-800 border-t border-zinc-200 dark:border-zinc-700 px-4 py-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -131,10 +115,7 @@
             </div>
         </div>
     </div>
-
-    {{-- Right Panel - Cart & Checkout --}}
     <div class="w-[400px] bg-white dark:bg-zinc-800 border-l border-zinc-200 dark:border-zinc-700 flex flex-col">
-        {{-- Cart Header --}}
         <div class="px-5 py-4 border-b border-zinc-200 dark:border-zinc-700">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -146,9 +127,7 @@
                         <p class="text-xs text-zinc-500">{{ count($this->cart) }} item</p>
                     </div>
                 </div>
-                
                 <div class="flex items-center gap-2">
-                    {{-- Dropdown Held Orders (Hanya muncul jika ada order yang ditahan) --}}
                     @if(count(session('held_orders', [])) > 0)
                         <flux:dropdown position="bottom" align="end">
                             <flux:button size="sm" variant="filled" color="amber" icon="clock">
@@ -158,7 +137,6 @@
                                 <flux:menu.heading>Pesanan Ditahan</flux:menu.heading>
                                 @foreach(session('held_orders', []) as $index => $heldOrder)
                                     <flux:menu.item wire:click="restoreOrder({{ $index }})" icon="arrow-uturn-left">
-                                        {{-- Tampilkan Nama Pelanggan dengan Jelas --}}
                                         <div class="flex flex-col">
                                             <span class="font-semibold text-zinc-900 dark:text-white">
                                                 {{ $heldOrder['customer_name'] ?? 'Unknown' }}
@@ -172,8 +150,6 @@
                             </flux:menu>
                         </flux:dropdown>
                     @endif
-
-                    {{-- Tombol Clear --}}
                     @if(count($this->cart) > 0)
                         <flux:button wire:click="clearCart" size="sm" variant="ghost" icon="trash" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
                             Hapus
@@ -182,31 +158,24 @@
                 </div>
             </div>
         </div>
-
-        {{-- Cart Items --}}
         <div class="flex-1 overflow-y-auto">
             @forelse($this->cart as $cartItem)
                 <div class="px-4 py-3 border-b border-zinc-100 dark:border-zinc-700/50 hover:bg-zinc-50 dark:hover:bg-zinc-700/30 transition-colors">
                     <div class="flex gap-3">
-                        {{-- Item Image --}}
                         <div class="size-14 bg-zinc-100 dark:bg-zinc-700 rounded-lg flex items-center justify-center shrink-0">
                             <flux:icon name="cube" class="size-6 text-zinc-400" />
                         </div>
-
-                        {{-- Item Details --}}
                         <div class="flex-1 min-w-0">
-                            <h4 class="font-medium text-sm text-zinc-900 dark:text-white truncate">
+                            <h4 class="font-medium text-sm text-zinc-900 dark:text-white whitespace-normal break-words line-clamp-2">
                                 {{ $cartItem['name'] }}
                             </h4>
                             <p class="text-xs text-zinc-500 mt-0.5">
                                 {{ \Illuminate\Support\Number::currency($cartItem['price'], 'IDR') }} × {{ $cartItem['quantity'] }}
                             </p>
-
-                            {{-- Quantity Controls --}}
                             <div class="flex items-center gap-2 mt-2">
                                 <div class="flex items-center bg-zinc-100 dark:bg-zinc-700 rounded-lg">
                                     <button
-                                        wire:click="decrementQuantity({{ $cartItem['id'] }})"
+                                        wire:click="decrementQuantity({{ $index }})"
                                         class="size-7 flex items-center justify-center text-zinc-600 dark:text-zinc-300
                                                hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded-l-lg transition-colors"
                                     >
@@ -216,7 +185,7 @@
                                         {{ $cartItem['quantity'] }}
                                     </span>
                                     <button
-                                        wire:click="incrementQuantity({{ $cartItem['id'] }})"
+                                        wire:click="incrementQuantity({{ $index }})"
                                         class="size-7 flex items-center justify-center text-zinc-600 dark:text-zinc-300
                                                hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded-r-lg transition-colors"
                                     >
@@ -224,7 +193,7 @@
                                     </button>
                                 </div>
                                 <button
-                                    wire:click="removeCart({{ $cartItem['id'] }})"
+                                    wire:click="removeCart({{ $index }})" 
                                     class="size-7 flex items-center justify-center text-red-500 hover:bg-red-50
                                            dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                 >
@@ -232,8 +201,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        {{-- Item Total --}}
                         <div class="text-right">
                             <span class="font-bold text-zinc-900 dark:text-white">
                                 {{ \Illuminate\Support\Number::currency($cartItem['price'] * $cartItem['quantity'], 'IDR') }}
@@ -251,15 +218,9 @@
                 </div>
             @endforelse
         </div>
-
-        {{-- Checkout Section --}}
         <div class="border-t border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50">
-            {{-- Customer & Payment --}}
-
-            {{-- Customer & Payment Section --}}
             <div class="p-4 space-y-3 border-b border-zinc-200 dark:border-zinc-700">
                 <div class="grid grid-cols-2 gap-2">
-                    {{-- Custom Customer Search --}}
                     <div class="relative" x-data="{ open: false }">
                         <div
                             @click="open = !open"
@@ -268,12 +229,10 @@
                        hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors"
                         >
                 <span class="{{ $customerId ? 'text-zinc-900 dark:text-white' : 'text-zinc-400' }}">
-                    {{ $customerId ? $customers->firstWhere('id', $customerId)?->name : 'Select customer...' }}
+                    {{ $customerId ? $customers->firstWhere('id', $customerId)?->name : 'Pilih Pelanggan...' }}
                 </span>
                             <flux:icon name="chevron-down" class="size-4 text-zinc-400" />
                         </div>
-
-                        {{-- Dropdown --}}
                         <div
                             x-show="open"
                             x-cloak
@@ -287,19 +246,16 @@
                             class="absolute z-50 w-full mt-1 bg-white dark:bg-zinc-800 border border-zinc-200
                        dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden"
                         >
-                            {{-- Search Input --}}
                             <div class="p-2 border-b border-zinc-200 dark:border-zinc-700">
                                 <input
                                     wire:model.live.debounce.300ms="customerSearch"
                                     type="text"
-                                    placeholder="Search..."
+                                    placeholder="Cari pelanggan..."
                                     class="w-full px-3 py-1.5 text-sm bg-zinc-50 dark:bg-zinc-900
                                border border-zinc-200 dark:border-zinc-700 rounded-md
                                focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 >
                             </div>
-
-                            {{-- Options --}}
                             <div class="max-h-48 overflow-y-auto">
                                 <button
                                     type="button"
@@ -314,7 +270,6 @@
                         </span>
                                     <span class="text-zinc-600 dark:text-zinc-400">Customer X</span>
                                 </button>
-
                                 @forelse($this->filteredCustomers as $customer)
                                     <button
                                         type="button"
@@ -349,8 +304,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- Payment Method Custom Select --}}
                     <div class="relative" x-data="{ open: false }">
                         <div
                             @click="open = !open"
@@ -379,8 +332,6 @@
                             </div>
                             <flux:icon name="chevron-down" class="size-4 text-zinc-400" />
                         </div>
-
-                        {{-- Dropdown --}}
                         <div
                             x-show="open"
                             x-cloak
@@ -434,8 +385,6 @@
                     </div>
                 </div>
             </div>
-
-            {{-- Totals --}}
             <div class="p-4 space-y-2">
                 <div class="flex justify-between text-sm">
                     <span class="text-zinc-500">Subtotal</span>
@@ -448,7 +397,7 @@
 
 
                 {{-- Discount Section --}}
-                @if(count($this->cart) > 0)
+                {{-- @if(count($this->cart) > 0)
                     @php $hasDiscount = $this->discountAmount > 0; @endphp
                     <div x-data="{ showDiscount: {{ $hasDiscount ? 'true' : 'false' }} }">
                         <template x-if="!showDiscount">
@@ -500,10 +449,7 @@
                             </div>
                         </template>
                     </div>
-                @endif
-
-
-                {{-- Total --}}
+                @endif --}}
                 <div class="flex justify-between items-center pt-3 border-t border-zinc-200 dark:border-zinc-700">
                     <span class="font-semibold text-zinc-900 dark:text-white">Total</span>
                     <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
@@ -511,8 +457,6 @@
                     </span>
                 </div>
             </div>
-
-            {{-- Payment Amount --}}
             <div class="px-4 pb-4">
                 <div class="bg-white dark:bg-zinc-700 rounded-xl p-3 mb-3">
                     <label class="text-xs text-zinc-500 dark:text-zinc-400 block mb-1">Jumlah Diterima</label>
@@ -528,8 +472,6 @@
                         >
                     </div>
                 </div>
-
-                {{-- Change --}}
                 @if($this->paidAmount > 0)
                     <div class="flex justify-between items-center p-3 rounded-xl mb-3
                                 {{ $this->change >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/20' : 'bg-red-50 dark:bg-red-900/20' }}">
@@ -541,8 +483,6 @@
                         </span>
                     </div>
                 @endif
-
-                {{-- Action Buttons --}}
                 <div class="grid grid-cols-2 gap-2">
                     <flux:button 
                         wire:click="holdOrder" 
@@ -566,13 +506,11 @@
             </div>
         </div>
     </div>
-{{-- Modal Pop-up Pilih Varian --}}
-<flux:modal wire:model="showVariantModal" class="min-w-[500px]">
+    <flux:modal wire:model="showVariantModal" class="min-w-[500px]">
         <div class="p-5">
             <h2 class="text-xl font-bold mb-4 text-zinc-900 dark:text-white">
                 Pilih Varian: {{ $selectedItemNameForVariant }}
             </h2>
-
             <div class="space-y-6">
                 @foreach($itemVariants as $group)
                     <div>
@@ -607,7 +545,6 @@
                     </div>
                 @endforeach
             </div>
-
             <div class="mt-8 flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-700">
                 <flux:button wire:click="$set('showVariantModal', false)" variant="ghost">Batal</flux:button>
                 <flux:button wire:click="confirmVariantSelection" variant="primary" class="bg-indigo-600 hover:bg-indigo-700" 
