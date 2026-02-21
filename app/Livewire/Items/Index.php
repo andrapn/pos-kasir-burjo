@@ -49,8 +49,8 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->label('Grup Varian')
                     ->badge()
                     ->listWithLineBreaks()
-                    ->limitList(3) 
-                    ->expandableLimitedList() 
+                    ->limitList(3)
+                    ->expandableLimitedList()
                     ->wrap()
                     ->searchable(),
                 TextColumn::make('price')

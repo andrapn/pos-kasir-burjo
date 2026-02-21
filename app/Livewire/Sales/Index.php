@@ -212,7 +212,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                     ->schema([
                                         TextEntry::make('item_name')
                                             ->label('Nama Item')
-                                            ->state(fn ($record) => $record->item_name ?? $record->item->name)
+                                            ->state(fn($record) => $record->item_name ?? $record->item->name)
                                             ->weight('bold'),
 
                                         TextEntry::make('quantity')

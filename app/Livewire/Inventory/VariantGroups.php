@@ -1,33 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Inventory;
 
 use App\Models\VariantGroup;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Repeater;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Actions\Contracts\HasActions;
-use Livewire\Component;
 use Illuminate\Contracts\View\View;
+use Livewire\Component;
 
-class VariantGroups extends Component implements HasForms, HasTable, HasActions
+final class VariantGroups extends Component implements HasForms, HasTable, HasActions
 {
+    use InteractsWithActions;
     use InteractsWithForms;
     use InteractsWithTable;
-    use InteractsWithActions;
+
     public ?array $data = [];
+
     public $editingId = null;
 
-    public function mount()
+    public function mount(): void
     {
         $this->form->fill();
     }
@@ -87,7 +91,7 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
     {
         $this->form->fill();
         $this->editingId = null;
-        $this->dispatch('open-variant-modal'); 
+        $this->dispatch('open-variant-modal');
     }
 
     public function openEdit($id): void
@@ -102,15 +106,15 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 'options' => $group->options->toArray(),
             ]);
         }
-        $this->dispatch('open-variant-modal'); 
+        $this->dispatch('open-variant-modal');
     }
 
-    public function delete($id)
+    public function delete($id): void
     {
         VariantGroup::find($id)?->delete();
     }
 
-    public function save()
+    public function save(): void
     {
         $data = $this->form->getState();
 
@@ -121,7 +125,7 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 'track_stock' => $data['track_stock'],
             ]);
             $group->options()->delete();
-            if (!empty($data['options'])) {
+            if ( ! empty($data['options'])) {
                 $group->options()->createMany($data['options']);
             }
         } else {
@@ -129,7 +133,7 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 'name' => $data['name'],
                 'track_stock' => $data['track_stock'],
             ]);
-            if (!empty($data['options'])) {
+            if ( ! empty($data['options'])) {
                 $group->options()->createMany($data['options']);
             }
         }

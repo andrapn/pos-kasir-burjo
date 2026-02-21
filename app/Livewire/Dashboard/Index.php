@@ -96,16 +96,16 @@ final class Index extends Component
             ->get();
     }
 
-    public function topSellingItems(): \Illuminate\Support\Collection
+    public function topSellingItems(): SupportCollection
     {
         return DB::table('sales_items')
             ->join('items', 'sales_items.item_id', 'items.id')
             ->select(
-                DB::raw('COALESCE(sales_items.item_name, items.name) as name'), 
-                DB::raw('SUM(sales_items.quantity) as total_sold')
+                DB::raw('COALESCE(sales_items.item_name, items.name) as name'),
+                DB::raw('SUM(sales_items.quantity) as total_sold'),
             )
             ->whereMonth('sales_items.created_at', now()->month)
-            ->groupByRaw('COALESCE(sales_items.item_name, items.name)') 
+            ->groupByRaw('COALESCE(sales_items.item_name, items.name)')
             ->orderByDesc('total_sold')
             ->take(5)
             ->get();
@@ -118,11 +118,12 @@ final class Index extends Component
             ->get()
             ->filter(function ($inventory) {
                 $threshold = $inventory->item->low_stock_threshold ?? 10;
+
                 return $inventory->quantity <= $threshold && $inventory->quantity > 0;
             })
             ->map(function ($inventory) {
                 $name = ucfirst((string) $inventory->item->name);
-                
+
                 if ($inventory->variant_option_id) {
                     $variant = VariantOption::find($inventory->variant_option_id);
                     if ($variant) {
@@ -133,7 +134,7 @@ final class Index extends Component
                 return [
                     'id' => $inventory->id,
                     'item' => [
-                        'name' => $name, 
+                        'name' => $name,
                     ],
                     'quantity' => $inventory->quantity,
                 ];
@@ -159,7 +160,7 @@ final class Index extends Component
             ];
 
             return [
-                'label' => $namaHari[$date->format('D')], 
+                'label' => $namaHari[$date->format('D')],
                 'date' => $date->toDateString(),
                 'total' => Sale::whereDate('created_at', $date)->sum('total'),
             ];

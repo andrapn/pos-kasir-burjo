@@ -3,11 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Livewire\Inventory;
-use App\Models\Item;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
+
 use App\Enums\ItemStatus;
 use App\Models\Inventory;
+use App\Models\Item;
 use App\Models\VariantOption;
 use Closure;
 use Filament\Actions\BulkActionGroup;
@@ -21,6 +20,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Tables\Columns\TextColumn;
@@ -57,10 +58,11 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                 $name .= ' (' . $variant->name . ')';
                             }
                         }
+
                         return $name;
                     })
                     // 2. GANTI SKU JADI CATEGORY BIAR GAK ERROR
-                    ->description(fn($record): string => "Kategori: " . ($record->item->category ?? 'Umum'))
+                    ->description(fn($record): string => 'Kategori: ' . ($record->item->category ?? 'Umum'))
                     ->searchable(),
 
                 TextColumn::make('item.price')
@@ -144,14 +146,14 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->prefixIcon('heroicon-o-cube')
                             ->placeholder('Select a product')
                             ->live()
-                            ->afterStateUpdated(fn (Set $set) => $set('variant_option_id', null))
+                            ->afterStateUpdated(fn(Set $set) => $set('variant_option_id', null))
                             // VVV TAMBAHAN VALIDASI ANTI DOBEL VVV
                             ->rules([
-                                fn (Get $get) => function (string $attribute, $value, Closure $fail) {
+                                fn(Get $get) => function (string $attribute, $value, Closure $fail): void {
                                     $item = Item::with('variantGroups')->find($value);
                                     $hasVariants = $item && $item->variantGroups->where('track_stock', true)->isNotEmpty();
-                                    
-                                    if (!$hasVariants) {
+
+                                    if ( ! $hasVariants) {
                                         $exists = Inventory::where('item_id', $value)->whereNull('variant_option_id')->exists();
                                         if ($exists) {
                                             $fail('Stok produk ini sudah tercatat. Silakan gunakan tombol Edit (ikon pensil) di tabel.');
@@ -165,10 +167,14 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->prefixIcon('heroicon-o-tag')
                             ->options(function (Get $get) {
                                 $itemId = $get('item_id');
-                                if (!$itemId) return [];
+                                if ( ! $itemId) {
+                                    return [];
+                                }
 
                                 $item = Item::with('variantGroups.options')->find($itemId);
-                                if (!$item) return [];
+                                if ( ! $item) {
+                                    return [];
+                                }
 
                                 $options = [];
                                 foreach ($item->variantGroups as $group) {
@@ -178,24 +184,31 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                         }
                                     }
                                 }
+
                                 return $options;
                             })
                             ->visible(function (Get $get) {
                                 $itemId = $get('item_id');
-                                if (!$itemId) return false;
+                                if ( ! $itemId) {
+                                    return false;
+                                }
                                 $item = Item::with('variantGroups')->find($itemId);
+
                                 return $item && $item->variantGroups->where('track_stock', true)->isNotEmpty();
                             })
                             ->required(function (Get $get) {
                                 $itemId = $get('item_id');
-                                if (!$itemId) return false;
+                                if ( ! $itemId) {
+                                    return false;
+                                }
                                 $item = Item::with('variantGroups')->find($itemId);
+
                                 return $item && $item->variantGroups->where('track_stock', true)->isNotEmpty();
                             })
                             ->searchable()
                             ->preload()
                             ->rules([
-                                fn (Get $get) => function (string $attribute, $value, Closure $fail) use ($get) {
+                                fn(Get $get) => function (string $attribute, $value, Closure $fail) use ($get): void {
                                     $exists = Inventory::where('item_id', $get('item_id'))
                                         ->where('variant_option_id', $value)
                                         ->exists();
@@ -269,7 +282,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->collapsible()
                             ->columns(2),
                     ]),
-                
+
                 // INI BAGIAN EDIT ACTION YANG BARU
                 EditAction::make()
                     ->modalHeading('Update Stock')
@@ -287,6 +300,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                         $name .= ' (' . $variant->name . ')';
                                     }
                                 }
+
                                 return $name;
                             }),
 
@@ -298,9 +312,9 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->prefixIcon('heroicon-o-hashtag')
                             ->hint('Timpa dengan angka stok fisik yang terbaru'),
                     ]),
-                
+
                 DeleteAction::make(),
-            ])            
+            ])
             ->toolbarActions([
                 BulkActionGroup::make([
 

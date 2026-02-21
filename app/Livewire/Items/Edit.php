@@ -60,7 +60,7 @@ final class Edit extends Component implements HasActions, HasSchemas
                                         'Menu Nasi' => 'Menu Nasi',
                                         'Orak-Arik' => 'Orak-Arik',
                                         'bubur' => 'bubur',
-                                        'Minuman' => 'Minuman',                                        
+                                        'Minuman' => 'Minuman',
                                         'Snack' => 'Snack',
                                         'Tambahan' => 'Tambahan',
                                     ])

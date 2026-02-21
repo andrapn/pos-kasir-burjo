@@ -27,23 +27,39 @@ final class Index extends Component implements HasActions, HasSchemas
     use InteractsWithSchemas;
 
     public array $items = [];
+
     /** @var Collection<int, Customer> */
     public $customers;
+
     /** @var Collection<int, PaymentMethod> */
     public $paymentMethods;
+
     public bool $showVariantModal = false;
+
     public int $selectedItemIdForVariant = 0;
+
     public string $selectedItemNameForVariant = '';
+
     public array $itemVariants = [];
+
     public array $selectedOptions = [];
+
     public ?string $search = null;
+
     public ?string $customerSearch = null;
+
     public string $activeCategory = 'Menu Nasi';
+
     public array $cart = [];
+
     public ?array $data = [];
+
     public $customerId;
+
     public $paymentMethodId;
+
     public int $paidAmount = 0;
+
     public float $discountAmount = 0;
 
     public function mount(): void
@@ -63,9 +79,9 @@ final class Index extends Component implements HasActions, HasSchemas
             ->map(fn(Item $item): array => [
                 'id' => $item->id,
                 'name' => $item->name,
-                'category' => $item->category ?? 'Makanan', 
+                'category' => $item->category ?? 'Makanan',
                 'price' => $item->price,
-                'stock' => $item->inventories->sum('quantity'), 
+                'stock' => $item->inventories->sum('quantity'),
             ])
             ->values()
             ->toArray();
@@ -77,6 +93,7 @@ final class Index extends Component implements HasActions, HasSchemas
             unset($this->cart[$index]);
         }
     }
+
     #[Computed]
     public function filteredItems(): array
     {
@@ -94,6 +111,7 @@ final class Index extends Component implements HasActions, HasSchemas
                 fn(array $item): bool => str_contains(mb_strtolower((string) $item['name']), $search),
             );
         }
+
         return $result;
     }
 
@@ -120,6 +138,7 @@ final class Index extends Component implements HasActions, HasSchemas
     public function total(): float
     {
         $calculatedTotal = $this->subtotal - (float) $this->discountAmount;
+
         return $calculatedTotal > 0 ? $calculatedTotal : 0;
     }
 
@@ -149,6 +168,7 @@ final class Index extends Component implements HasActions, HasSchemas
                                 ->where('variant_option_id', $opt->id)->first();
                             $stock = $inv ? $inv->quantity : 0;
                         }
+
                         return [
                             'id' => $opt->id,
                             'name' => $opt->name,
@@ -158,6 +178,7 @@ final class Index extends Component implements HasActions, HasSchemas
                 ];
             })->toArray();
             $this->showVariantModal = true;
+
             return;
         }
         $this->processAddToCart($item);
@@ -167,6 +188,7 @@ final class Index extends Component implements HasActions, HasSchemas
     {
         if (count($this->selectedOptions) !== count($this->itemVariants)) {
             Notification::make()->title('Gagal!')->body('Harap pilih semua varian.')->warning()->send();
+
             return;
         }
         $item = Item::find($this->selectedItemIdForVariant);
@@ -182,6 +204,7 @@ final class Index extends Component implements HasActions, HasSchemas
                 $currentQty = $this->cart[$cartKey]['quantity'] ?? 0;
                 if ($currentQty >= $opt['stock']) {
                     Notification::make()->title("Stok {$opt['name']} tidak cukup!")->danger()->send();
+
                     return;
                 }
             }
@@ -212,6 +235,7 @@ final class Index extends Component implements HasActions, HasSchemas
                 ->body('Stok varian ini sudah habis.')
                 ->warning()
                 ->send();
+
             return;
         }
         $this->processAddToCart($variant->item, $variant);
@@ -250,24 +274,25 @@ final class Index extends Component implements HasActions, HasSchemas
             $isStockSufficient = true;
             $maxStock = 0;
             $stokVarianBerkurang = false;
-            if (!empty($cartItem['variant_ids']) && is_array($cartItem['variant_ids'])) {
+            if ( ! empty($cartItem['variant_ids']) && is_array($cartItem['variant_ids'])) {
                 foreach ($cartItem['variant_ids'] as $vId) {
                     $inv = Inventory::where('item_id', $itemId)
-                                    ->where('variant_option_id', $vId)
-                                    ->first();
+                        ->where('variant_option_id', $vId)
+                        ->first();
                     if ($inv) {
                         $stokVarianBerkurang = true;
                         if ($currentQty >= $inv->quantity) {
                             $isStockSufficient = false;
                             $maxStock = $inv->quantity;
+
                             break;
                         }
                     }
                 }
-            } elseif (!empty($cartItem['variant_id'])) {
+            } elseif ( ! empty($cartItem['variant_id'])) {
                 $inv = Inventory::where('item_id', $itemId)
-                                ->where('variant_option_id', $cartItem['variant_id'])
-                                ->first();
+                    ->where('variant_option_id', $cartItem['variant_id'])
+                    ->first();
                 if ($inv) {
                     $stokVarianBerkurang = true;
                     if ($currentQty >= $inv->quantity) {
@@ -279,11 +304,11 @@ final class Index extends Component implements HasActions, HasSchemas
 
             // 3. Jika varian tidak punya stok sendiri (misal: Level Pedas) ATAU ini menu reguler,
             // maka cek sisa stok menu induknya
-            if (!$stokVarianBerkurang) {
+            if ( ! $stokVarianBerkurang) {
                 $invParent = Inventory::where('item_id', $itemId)
-                                      ->whereNull('variant_option_id')
-                                      ->first();
-                if (!$invParent) {
+                    ->whereNull('variant_option_id')
+                    ->first();
+                if ( ! $invParent) {
                     $invParent = Inventory::where('item_id', $itemId)->first();
                 }
                 if ($invParent && $currentQty >= $invParent->quantity) {
@@ -293,13 +318,14 @@ final class Index extends Component implements HasActions, HasSchemas
             }
 
             // Tampilkan Alert & Tolak Penambahan jika stok nggak cukup
-            if (!$isStockSufficient) {
+            if ( ! $isStockSufficient) {
                 Notification::make()
                     ->title('Stok Habis!')
                     ->body("Sisa maksimal yang bisa dibeli hanya {$maxStock}.")
                     ->warning()
                     ->send();
-                return; 
+
+                return;
             }
 
             $this->cart[$index]['quantity']++;
@@ -312,7 +338,7 @@ final class Index extends Component implements HasActions, HasSchemas
             if ($this->cart[$index]['quantity'] > 1) {
                 $this->cart[$index]['quantity']--;
             } else {
-                $this->removeCart($index); 
+                $this->removeCart($index);
             }
         }
     }
@@ -332,14 +358,16 @@ final class Index extends Component implements HasActions, HasSchemas
                 ->body('Tidak dapat menahan pesanan kosong.')
                 ->warning()
                 ->send();
+
             return;
         }
-        if (! $this->customerId) {
+        if ( ! $this->customerId) {
             Notification::make()
                 ->title('Pilih Pelanggan!')
                 ->body('Harap pilih atau tambahkan nama pelanggan terlebih dahulu agar pesanan mudah dicari nanti.')
                 ->warning()
                 ->send();
+
             return;
         }
         $customerName = Customer::find($this->customerId)?->name ?? 'Pelanggan';
@@ -376,6 +404,7 @@ final class Index extends Component implements HasActions, HasSchemas
                 ->body('Harap selesaikan atau kosongkan pesanan saat ini terlebih dahulu.')
                 ->warning()
                 ->send();
+
             return;
         }
         $order = $heldOrders[$index];
@@ -402,6 +431,7 @@ final class Index extends Component implements HasActions, HasSchemas
             return $this->customers;
         }
         $search = mb_strtolower($this->customerSearch);
+
         return $this->customers->filter(
             fn($customer): bool => str_contains(mb_strtolower($customer->name), $search)
                 || str_contains(mb_strtolower($customer->phone ?? ''), $search)
@@ -430,6 +460,7 @@ final class Index extends Component implements HasActions, HasSchemas
                 ->body('Harap tambahkan barang ke keranjang sebelum melakukan pembayaran.')
                 ->danger()
                 ->send();
+
             return;
         }
         if ( ! $this->paymentMethodId) {
@@ -438,6 +469,7 @@ final class Index extends Component implements HasActions, HasSchemas
                 ->body('Silakan pilih metode pembayaran')
                 ->danger()
                 ->send();
+
             return;
         }
         if ($this->paidAmount < $this->total) {
@@ -446,8 +478,10 @@ final class Index extends Component implements HasActions, HasSchemas
                 ->body('Jumlah pembayaran tidak mencukupi.')
                 ->danger()
                 ->send();
+
             return;
         }
+
         try {
             DB::transaction(function (): void {
                 $sale = Sale::create([
@@ -465,7 +499,7 @@ final class Index extends Component implements HasActions, HasSchemas
                         'price' => $item['price'],
                     ]);
                     $stokVarianBerkurang = false;
-                    if (!empty($item['variant_ids']) && is_array($item['variant_ids'])) {
+                    if ( ! empty($item['variant_ids']) && is_array($item['variant_ids'])) {
                         foreach ($item['variant_ids'] as $vId) {
                             $inv = Inventory::where('item_id', $item['id'])
                                 ->where('variant_option_id', $vId)
@@ -475,7 +509,7 @@ final class Index extends Component implements HasActions, HasSchemas
                                 $stokVarianBerkurang = true;
                             }
                         }
-                    } elseif (!empty($item['variant_id'])) {
+                    } elseif ( ! empty($item['variant_id'])) {
                         $inv = Inventory::where('item_id', $item['id'])
                             ->where('variant_option_id', $item['variant_id'])
                             ->first();
@@ -484,11 +518,11 @@ final class Index extends Component implements HasActions, HasSchemas
                             $stokVarianBerkurang = true;
                         }
                     }
-                    if (!$stokVarianBerkurang) {
+                    if ( ! $stokVarianBerkurang) {
                         $invParent = Inventory::where('item_id', $item['id'])
                             ->whereNull('variant_option_id')
                             ->first();
-                        if (!$invParent) {
+                        if ( ! $invParent) {
                             $invParent = Inventory::where('item_id', $item['id'])->first();
                         }
                         if ($invParent) {
@@ -536,8 +570,8 @@ final class Index extends Component implements HasActions, HasSchemas
 
         if ($variant) {
             $inv = Inventory::where('item_id', $item->id)
-                            ->where('variant_option_id', $variant->id)
-                            ->first();
+                ->where('variant_option_id', $variant->id)
+                ->first();
             if ($inv) {
                 $stokVarianBerkurang = true;
                 if ($currentQty >= $inv->quantity) {
@@ -547,11 +581,11 @@ final class Index extends Component implements HasActions, HasSchemas
             }
         }
 
-        if (!$stokVarianBerkurang) {
+        if ( ! $stokVarianBerkurang) {
             $invParent = Inventory::where('item_id', $item->id)
-                                  ->whereNull('variant_option_id')
-                                  ->first();
-            if (!$invParent) {
+                ->whereNull('variant_option_id')
+                ->first();
+            if ( ! $invParent) {
                 $invParent = Inventory::where('item_id', $item->id)->first();
             }
             if ($invParent && $currentQty >= $invParent->quantity) {
@@ -560,12 +594,13 @@ final class Index extends Component implements HasActions, HasSchemas
             }
         }
 
-        if (!$isStockSufficient) {
+        if ( ! $isStockSufficient) {
             Notification::make()
                 ->title('Stok Habis!')
                 ->body("Sisa stok {$item->name} hanya {$maxStock}.")
                 ->warning()
                 ->send();
+
             return;
         }
 
