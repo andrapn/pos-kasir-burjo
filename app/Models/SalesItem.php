@@ -44,6 +44,7 @@ final class SalesItem extends Model
     protected $fillable = [
         'sale_id',
         'item_id',
+        'item_name',
         'quantity',
         'price',
     ];

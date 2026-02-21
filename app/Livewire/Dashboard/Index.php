@@ -100,9 +100,14 @@ final class Index extends Component
     {
         return DB::table('sales_items')
             ->join('items', 'sales_items.item_id', 'items.id')
-            ->select('items.name', DB::raw('SUM(sales_items.quantity) as total_sold'))
+            ->select(
+                // COALESCE: Kalau item_name kosong (transaksi jadul), pakai nama dari tabel items. 
+                // Kalau ada (transaksi baru yg pakai varian), pakai dari sales_items.
+                DB::raw('COALESCE(sales_items.item_name, items.name) as name'), 
+                DB::raw('SUM(sales_items.quantity) as total_sold')
+            )
             ->whereMonth('sales_items.created_at', now()->month)
-            ->groupBy('items.id', 'items.name')
+            ->groupBy('name') // Kelompokkan berdasarkan nama varian yang unik
             ->orderByDesc('total_sold')
             ->take(5)
             ->get();

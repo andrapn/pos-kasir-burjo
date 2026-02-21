@@ -470,10 +470,10 @@ final class Index extends Component implements HasActions, HasSchemas
                     // 1. Catat ke history penjualan
                     $sale->salesItems()->create([
                         'item_id' => $item['id'],
+                        'item_name' => $item['name'], // <--- TAMBAHAN: Nyimpen "Nutrisari (Semangka)"
                         'quantity' => $item['quantity'],
                         'price' => $item['price'],
                     ]);
-
                     $stokVarianBerkurang = false;
 
                     // 2. Coba potong stok khusus varian (Jika item punya varian dan track_stock-nya aktif)

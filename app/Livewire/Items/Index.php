@@ -44,18 +44,21 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->weight('bold')
                     ->icon('heroicon-o-cube')
                     ->searchable(),
-
+                TextColumn::make('variantGroups.name')
+                    ->label('Group Varian')
+                    ->badge() // Biar tampilannya kotak-kotak rapi
+                    ->separator(', ')
+                    ->searchable(),
                 TextColumn::make('price')
                     ->label('Price')
                     ->money()
                     ->color('success')
                     ->weight('bold'),
 
-                TextColumn::make('inventory.quantity')
+                TextColumn::make('total_stock')
                     ->label('Stock')
+                    ->getStateUsing(fn($record) => $record->inventories->sum('quantity'))
                     ->badge()
-                    ->default(0)
-                    ->sortable()
                     ->color(fn($state): string => match (true) {
                         $state <= 0 => 'danger',
                         $state <= 10 => 'warning',
@@ -132,9 +135,9 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                     ->color('success')
                                     ->icon('heroicon-m-currency-dollar'),
 
-                                TextEntry::make('inventory.quantity')
+                                TextEntry::make('total_stock')
                                     ->label('In Stock')
-                                    ->default(0)
+                                    ->state(fn($record) => $record->inventories->sum('quantity'))
                                     ->size('lg')
                                     ->weight('bold')
                                     ->badge()
@@ -156,8 +159,8 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
 
                                 TextEntry::make('stock_value')
                                     ->label('Stock Value')
-                                    ->state(fn($record): int|float => ($record->inventory ?? 0) * $record->price)
-                                    ->money()
+                                    ->state(fn($record): float => $record->inventories->sum('quantity') * (float) $record->price)
+                                    ->money('IDR') // Pastikan ada format mata uangnya
                                     ->size('lg')
                                     ->weight('bold')
                                     ->color('warning')
