@@ -55,16 +55,16 @@ final class Edit extends Component implements HasActions, HasSchemas
                                 Select::make('category')
                                     ->label('Kategori')
                                     ->options([
-                                        'Makanan' => 'Makanan',
                                         'Nasi Goreng' => 'Nasi Goreng',
                                         'Menu Mie' => 'Menu Mie',
                                         'Menu Nasi' => 'Menu Nasi',
+                                        'bubur' => 'bubur',
                                         'Minuman' => 'Minuman',                                        
                                         'Snack' => 'Snack',
                                         'Tambahan' => 'Tambahan',
                                     ])
                                     ->required()
-                                    ->default('Makanan'),
+                                    ->default('Menu Nasi'),
 
                                 Select::make('variantGroups')
                                     ->relationship('variantGroups', 'name')

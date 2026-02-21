@@ -34,7 +34,7 @@
             </div>
         </div>
         <div class="flex space-x-2 mb-4 p-1 overflow-x-auto">
-            @foreach(['All', 'Makanan', 'Menu Nasi', 'Nasi Goreng', 'Menu Mie', 'Snack', 'Minuman'] as $cat)
+            @foreach(['All', 'Menu Nasi', 'Nasi Goreng', 'Menu Mie', 'bubur', 'Snack', 'Minuman'] as $cat)
                 <button
                     wire:click="$set('activeCategory', '{{ $cat }}')"
                     class="px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap
