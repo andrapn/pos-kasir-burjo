@@ -33,9 +33,8 @@
                 <flux:button icon="squares-2x2" variant="ghost" />
             </div>
         </div>
-{{-- Tabs Kategori --}}
         <div class="flex space-x-2 mb-4 p-1 overflow-x-auto">
-            @foreach(['All', 'Makanan', 'Snack', 'Minuman'] as $cat)
+            @foreach(['All', 'Makanan', 'Menu Nasi', 'Nasi Goreng', 'Menu Mie', 'Snack', 'Minuman'] as $cat)
                 <button
                     wire:click="$set('activeCategory', '{{ $cat }}')"
                     class="px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap
@@ -366,7 +365,7 @@
                                         name="{{ match($selectedMethod?->name) {
                         'Cash' => 'banknotes',
                         'Card' => 'credit-card',
-                        'Mobile Money' => 'device-phone-mobile',
+                        'Mobile' => 'device-phone-mobile',
                         'Bank Transfer' => 'building-library',
                         default => 'currency-dollar'
                     } }}"
@@ -400,14 +399,14 @@
                                     $icon = match($method->name) {
                                         'Cash' => 'banknotes',
                                         'Card' => 'credit-card',
-                                        'Mobile Money' => 'device-phone-mobile',
+                                        'Mobile' => 'device-phone-mobile',
                                         'Bank Transfer' => 'building-library',
                                         default => 'currency-dollar'
                                     };
                                     $color = match($method->name) {
                                         'Cash' => 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50',
                                         'Card' => 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50',
-                                        'Mobile Money' => 'text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50',
+                                        'Mobile' => 'text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50',
                                         'Bank Transfer' => 'text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/50',
                                         default => 'text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900/50'
                                     };

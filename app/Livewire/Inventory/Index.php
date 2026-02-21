@@ -65,7 +65,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
 
                 TextColumn::make('item.price')
                     ->label('Harga Unit')
-                    ->money()
+                    ->money('IDR')
                     ->color('info')
                     ->sortable()
                     ->alignLeft(),

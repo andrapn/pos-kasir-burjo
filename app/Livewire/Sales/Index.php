@@ -48,14 +48,14 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->icon(fn(?string $state): string => match ($state) {
                         'Cash' => 'heroicon-o-banknotes',
                         'Card' => 'heroicon-o-credit-card',
-                        'Mobile Money' => 'heroicon-o-device-phone-mobile',
+                        'Mobile' => 'heroicon-o-device-phone-mobile',
                         'Bank Transfer' => 'heroicon-o-building-library',
                         default => 'heroicon-o-currency-dollar',
                     })
                     ->color(fn(?string $state): string => match ($state) {
                         'Cash' => 'success',
                         'Card' => 'info',
-                        'Mobile Money' => 'warning',
+                        'Mobile' => 'warning',
                         'Bank Transfer' => 'primary',
                         default => 'gray',
                     }),
@@ -111,7 +111,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                 Section::make()
                                     ->schema([
                                         TextEntry::make('paid_amount')
-                                            ->label('Paid')
+                                            ->label('Dibayar')
                                             ->money('IDR')
                                             ->icon('heroicon-o-banknotes')
                                             ->color('info')
@@ -122,7 +122,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                 Section::make()
                                     ->schema([
                                         TextEntry::make('balance')
-                                            ->label('Balance')
+                                            ->label('Saldo')
                                             ->state(fn(Sale $record): float => (float) $record->total - (float) $record->paid_amount)
                                             ->money('IDR')
                                             ->icon('heroicon-o-calculator')
@@ -134,7 +134,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                 Section::make()
                                     ->schema([
                                         TextEntry::make('discount')
-                                            ->label('Discount')
+                                            ->label('Diskon')
                                             ->money('IDR')
                                             ->icon('heroicon-o-tag')
                                             ->color('warning')
@@ -146,11 +146,11 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                         // Customer & Payment Info
                         Grid::make(2)
                             ->schema([
-                                Section::make('Customer')
+                                Section::make('Pelanggan')
                                     ->icon('heroicon-o-user')
                                     ->schema([
                                         TextEntry::make('customer.name')
-                                            ->label('Name')
+                                            ->label('Nama')
                                             ->icon('heroicon-o-user-circle')
                                             ->placeholder('Walk-in Customer'),
 
@@ -161,29 +161,29 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                             ->placeholder('No email'),
 
                                         TextEntry::make('customer.phone')
-                                            ->label('Phone')
+                                            ->label('Telepon')
                                             ->icon('heroicon-o-phone')
                                             ->copyable()
                                             ->placeholder('No phone'),
                                     ]),
 
-                                Section::make('Payment')
+                                Section::make('Pembayaran')
                                     ->icon('heroicon-o-credit-card')
                                     ->schema([
                                         TextEntry::make('paymentMethod.name')
-                                            ->label('Method')
+                                            ->label('Metode Pembayaran')
                                             ->badge()
                                             ->icon(fn(?string $state): string => match ($state) {
                                                 'Cash' => 'heroicon-o-banknotes',
                                                 'Card' => 'heroicon-o-credit-card',
-                                                'Mobile Money' => 'heroicon-o-device-phone-mobile',
+                                                'Mobile' => 'heroicon-o-device-phone-mobile',
                                                 'Bank Transfer' => 'heroicon-o-building-library',
                                                 default => 'heroicon-o-currency-dollar',
                                             })
                                             ->color(fn(?string $state): string => match ($state) {
                                                 'Cash' => 'success',
                                                 'Card' => 'info',
-                                                'Mobile Money' => 'warning',
+                                                'Mobile' => 'warning',
                                                 'Bank Transfer' => 'primary',
                                                 default => 'gray',
                                             }),
@@ -196,7 +196,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                             ->color(fn(Sale $record): string => ((float) $record->total - (float) $record->paid_amount) <= 0 ? 'success' : 'warning'),
 
                                         TextEntry::make('created_at')
-                                            ->label('Date')
+                                            ->label('Tanggal')
                                             ->dateTime('M d, Y - H:i')
                                             ->icon('heroicon-o-calendar'),
                                     ]),
@@ -211,7 +211,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                     ->hiddenLabel()
                                     ->schema([
                                         TextEntry::make('item.name')
-                                            ->label('Product')
+                                            ->label('Produk')
                                             ->weight('bold'),
 
                                         TextEntry::make('quantity')
@@ -220,7 +220,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                                             ->color('gray'),
 
                                         TextEntry::make('price')
-                                            ->label('Unit Price')
+                                            ->label('Harga Unit')
                                             ->money('IDR'),
 
                                         TextEntry::make('subtotal')
@@ -236,8 +236,8 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                             ->extraAttributes(['class' => 'max-h-64 overflow-y-auto']),
                     ]),
             ])
-            ->emptyStateHeading('No sales yet')
-            ->emptyStateDescription('Create your first sale to get started.')
+            ->emptyStateHeading('Belum ada penjualan')
+            ->emptyStateDescription('Buat penjualan pertama Anda untuk memulai.')
             ->emptyStateIcon('heroicon-o-shopping-cart')
             ->defaultSort('created_at', 'desc')
             ->striped()

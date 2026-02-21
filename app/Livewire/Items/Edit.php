@@ -56,8 +56,12 @@ final class Edit extends Component implements HasActions, HasSchemas
                                     ->label('Kategori')
                                     ->options([
                                         'Makanan' => 'Makanan',
+                                        'Nasi Goreng' => 'Nasi Goreng',
+                                        'Menu Mie' => 'Menu Mie',
+                                        'Menu Nasi' => 'Menu Nasi',
+                                        'Minuman' => 'Minuman',                                        
                                         'Snack' => 'Snack',
-                                        'Minuman' => 'Minuman',
+                                        'Tambahan' => 'Tambahan',
                                     ])
                                     ->required()
                                     ->default('Makanan'),

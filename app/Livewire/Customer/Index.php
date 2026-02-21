@@ -35,7 +35,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
             ->query(Customer::query())
             ->columns([
                 TextColumn::make('name')
-                    ->label('Customer')
+                    ->label('Pelanggan')
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
@@ -46,17 +46,17 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->icon('heroicon-o-envelope')
                     ->placeholder('No email'),
                 TextColumn::make('phone')
-                    ->label('Phone')
+                    ->label('Telepon')
                     ->searchable()
                     ->icon('heroicon-o-phone')
                     ->placeholder('No phone'),
                 ToggleColumn::make('is_active')
-                    ->label('Active')
+                    ->label('Aktif')
                     ->onColor('success')
                     ->offColor('danger')
                     ->alignCenter(),
                 TextColumn::make('sales_count')
-                    ->label('Orders')
+                    ->label('Pesanan')
                     ->counts('sales')
                     ->badge()
                     ->sortable()

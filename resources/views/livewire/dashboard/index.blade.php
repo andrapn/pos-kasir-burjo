@@ -226,7 +226,7 @@
                                 $badgeColor = match($sale->paymentMethod?->name) {
                                     'Cash' => 'emerald',
                                     'Card' => 'blue',
-                                    'Mobile Money' => 'amber',
+                                    'Mobile' => 'amber',
                                     'Bank Transfer' => 'purple',
                                     default => 'zinc'
                                 };

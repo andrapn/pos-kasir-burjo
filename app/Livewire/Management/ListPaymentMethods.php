@@ -88,7 +88,7 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                     ->modalIcon(fn(PaymentMethod $record): string => match ($record->name) {
                         'Cash' => 'heroicon-o-banknotes',
                         'Card' => 'heroicon-o-credit-card',
-                        'Mobile Money' => 'heroicon-o-device-phone-mobile',
+                        'Mobile' => 'heroicon-o-device-phone-mobile',
                         'Bank Transfer' => 'heroicon-o-building-library',
                         default => 'heroicon-o-currency-dollar',
                     })
@@ -142,7 +142,7 @@ final class ListPaymentMethods extends Component implements HasActions, HasSchem
                                             ->icon(fn(PaymentMethod $record): string => match ($record->name) {
                                                 'Cash' => 'heroicon-o-banknotes',
                                                 'Card' => 'heroicon-o-credit-card',
-                                                'Mobile Money' => 'heroicon-o-device-phone-mobile',
+                                                'Mobile' => 'heroicon-o-device-phone-mobile',
                                                 'Bank Transfer' => 'heroicon-o-building-library',
                                                 default => 'heroicon-o-currency-dollar',
                                             }),
