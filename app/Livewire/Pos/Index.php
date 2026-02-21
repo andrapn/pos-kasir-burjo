@@ -64,26 +64,27 @@ final class Index extends Component implements HasActions, HasSchemas
 
     public function mount(): void
     {
-        // Ambil item beserta semua baris inventory-nya
+        $this->loadItems();
+        $this->customers = Customer::all();
+        $this->paymentMethods = PaymentMethod::select(['id', 'name'])->get();
+    }
+
+    public function loadItems(): void
+    {
         $this->items = Item::with('inventories')
             ->active()
             ->latest()
             ->get()
-            // Saring: Hanya tampilkan item yang TOTAL stoknya > 0
             ->filter(fn(Item $item) => $item->inventories->sum('quantity') > 0)
             ->map(fn(Item $item): array => [
                 'id' => $item->id,
                 'name' => $item->name,
                 'category' => $item->category ?? 'Makanan', 
                 'price' => $item->price,
-                // Jumlahkan semua stok variannya di sini!
                 'stock' => $item->inventories->sum('quantity'), 
             ])
-            ->values() // WAJIB ADA: Biar index array-nya keriset (nggak bolong-bolong akibat proses filter)
+            ->values()
             ->toArray();
-
-        $this->customers = Customer::all();
-        $this->paymentMethods = PaymentMethod::select(['id', 'name'])->get();
     }
 
     #[Computed]
@@ -486,11 +487,29 @@ final class Index extends Component implements HasActions, HasSchemas
                             ->where('variant_option_id', $item['variant_id'])
                             ->decrement('quantity', $item['quantity']);
                     } else {
-                        // JIKA PRODUK REGULER (TANPA VARIAN)
-                        // Pakai first() agar dijamin langsung ngurangin 1 baris stok utama yang ada
-                        $inventory = Inventory::where('item_id', $item['id'])->first();
-                        if ($inventory) {
-                            $inventory->decrement('quantity', $item['quantity']);
+                        if (!empty($item['variant_ids']) && is_array($item['variant_ids'])) {
+                            // Jika produk ini Master Varian
+                            foreach ($item['variant_ids'] as $vId) {
+                                Inventory::where('item_id', $item['id'])
+                                    ->where('variant_option_id', $vId)
+                                    ->decrement('quantity', $item['quantity']);
+                            }
+                        } elseif (!empty($item['variant_id'])) {
+                            // Jika varian tunggal lama
+                            Inventory::where('item_id', $item['id'])
+                                ->where('variant_option_id', $item['variant_id'])
+                                ->decrement('quantity', $item['quantity']);
+                        } else {
+                            // JIKA PRODUK REGULER (TANPA VARIAN)
+                            // 1. Cari dulu ID baris stoknya
+                            $inventory = Inventory::where('item_id', $item['id'])->first();
+                            
+                            if ($inventory) {
+                                // 2. Tembak langsung pakai Query Builder berdasarkan ID-nya
+                                // Ini bakal nge-bypass InventoryObserver secara total
+                                Inventory::where('id', $inventory->id)
+                                    ->decrement('quantity', $item['quantity']);
+                            }
                         }
                     }
                 }
@@ -504,6 +523,7 @@ final class Index extends Component implements HasActions, HasSchemas
 
             // Panggil fungsi bawaan untuk mereset layar kasir
             $this->clearCart();
+            $this->loadItems();
             $this->search = '';
             $this->customerSearch = '';
             $this->customerId = null;
