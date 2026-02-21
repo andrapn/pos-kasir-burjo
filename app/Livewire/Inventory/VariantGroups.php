@@ -36,7 +36,8 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
     public function table(Table $table): Table
     {
         return $table
-            ->query(VariantGroup::query())
+            // 👇 FIX LEMOT: Tambahkan with('options') agar database cuma ditarik 1 kali
+            ->query(VariantGroup::query()->with('options'))
             ->columns([
                 TextColumn::make('name')
                     ->label('Nama Grup (Cth: Rasa)')
@@ -49,11 +50,16 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                     ->counts('options'),
                 TextColumn::make('options.name')
                     ->label('Daftar Opsi')
-                    ->badge(),
-                // KITA PAKAI KOLOM CUSTOM UNTUK TOMBOL
+                    ->badge()
+                    // 👇 FIX OFFSIDE: Lipat opsi yang kepanjangan
+                    ->limitList(3) // Maksimal tampilkan 3 badge
+                    ->expandableLimitedList() // Sisanya disembunyikan jadi tombol
+                    ->wrap(), // Jaga-jaga paksa turun ke baris baru kalau layar sempit
+                
+                // Kolom aksi custom kamu
                 TextColumn::make('id')
                     ->label('Aksi')
-                    ->view('livewire.inventory.table-actions')
+                    ->view('livewire.inventory.table-actions'),
             ]);
     }
 
