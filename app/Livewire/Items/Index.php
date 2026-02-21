@@ -38,7 +38,7 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(fn(): Builder => Item::query())
+            ->query(fn(): Builder => Item::query()->with(['inventories', 'variantGroups']))
             ->columns([
                 TextColumn::make('name')
                     ->weight('bold')

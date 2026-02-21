@@ -8,10 +8,10 @@
             </a>
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                    Create Item
+                    Buat Item
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Add a new item to your inventory
+                    Tambahkan item baru ke inventaris Anda
                 </p>
             </div>
         </div>
@@ -29,14 +29,14 @@
                 color="gray"
                 icon="heroicon-o-x-mark"
             >
-                Cancel
+                Batal
             </x-filament::button>
 
             <x-filament::button
                 type="submit"
                 icon="heroicon-m-sparkles"
             >
-                Create Item
+                Buat Item
             </x-filament::button>
         </div>
     </form>

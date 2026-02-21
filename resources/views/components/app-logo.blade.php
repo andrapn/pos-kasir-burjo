@@ -3,5 +3,5 @@
 </div>
 
 <div class="ms-1 grid flex-1 text-start text-sm">
-    <span class="mb-0.5 truncate leading-tight font-semibold">Pos System</span>
+    <span class="mb-0.5 truncate leading-tight font-semibold">Kasir Burjo Moro Seneng</span>
 </div>

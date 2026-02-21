@@ -319,29 +319,44 @@ final class Index extends Component implements HasActions, HasSchemas
             return;
         }
 
-        // 2. Ambil data hold order yang sudah ada di session (jika ada)
+        // 2. WAJIBKAN ISI PELANGGAN
+        if (! $this->customerId) {
+            Notification::make()
+                ->title('Pilih Pelanggan!')
+                ->body('Harap pilih atau tambahkan nama pelanggan terlebih dahulu agar pesanan mudah dicari nanti.')
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        // Ambil nama pelanggan untuk disimpan di session (biar gampang ditampilin di UI)
+        $customerName = Customer::find($this->customerId)?->name ?? 'Pelanggan';
+
+        // 3. Ambil data hold order yang sudah ada di session (jika ada)
         $heldOrders = session()->get('held_orders', []);
 
-        // 3. Tambahkan order saat ini ke dalam array
+        // 4. Tambahkan order saat ini ke dalam array
         $heldOrders[] = [
             'time' => now()->format('H:i'),
             'customer_id' => $this->customerId,
+            'customer_name' => $customerName, // <--- Menyimpan nama ke session
             'cart' => $this->cart,
             'discount' => $this->discountAmount,
             'total' => $this->total,
         ];
 
-        // 4. Simpan kembali ke session
+        // 5. Simpan kembali ke session
         session()->put('held_orders', $heldOrders);
 
-        // 5. Bersihkan layar kasir untuk pelanggan berikutnya
+        // 6. Bersihkan layar kasir untuk pelanggan berikutnya
         $this->clearCart();
         $this->customerId = null;
         $this->paymentMethodId = null;
 
         Notification::make()
             ->title('Order Held!')
-            ->body('Pesanan berhasil disimpan sementara.')
+            ->body('Pesanan atas nama ' . $customerName . ' berhasil ditahan.')
             ->success()
             ->send();
     }

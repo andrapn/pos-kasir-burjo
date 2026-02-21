@@ -8,7 +8,7 @@
         <div class="flex items-center gap-2">
             <flux:badge color="emerald" icon="clock">{{ now()->format('H:i') }}</flux:badge>
             <flux:button href="{{ route('pos.index') }}" wire:navigate variant="primary" icon="shopping-cart">
-                New Sale
+                Penjualan Baru
             </flux:button>
         </div>
     </div>
@@ -19,12 +19,12 @@
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <flux:subheading>Today's Sales</flux:subheading>
+                    <flux:subheading>Penjualan Hari Ini</flux:subheading>
                     <flux:heading size="xl" class="mt-1">
                         {{ \Illuminate\Support\Number::currency($this->todaySales['total'], 'IDR') }}
                     </flux:heading>
                     <flux:subheading size="sm" class="mt-1">
-                        {{ $this->todaySales['count'] }} transactions
+                        {{ $this->todaySales['count'] }} transaksi
                     </flux:subheading>
                 </div>
                 <div class="size-12 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl flex items-center justify-center">
@@ -37,7 +37,7 @@
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <flux:subheading>Today's Customers</flux:subheading>
+                    <flux:subheading>Pelanggan Hari Ini</flux:subheading>
                     <flux:heading size="xl" class="mt-1">{{ $this->todayCustomers }}</flux:heading>
                     <flux:subheading size="sm" class="mt-1">{{ $this->totalCustomers }} total</flux:subheading>
                 </div>
@@ -51,9 +51,9 @@
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <flux:subheading>Low Stock Items</flux:subheading>
+                    <flux:subheading>Item Stok Rendah</flux:subheading>
                     <flux:heading size="xl" class="mt-1">{{ $this->lowStockItems }}</flux:heading>
-                    <p class="text-xs text-red-500 mt-1">{{ $this->outOfStockItems() }} out of stock</p>
+                    <p class="text-xs text-red-500 mt-1">{{ $this->outOfStockItems() }} Habis Stok</p>
                 </div>
                 <div class="size-12 bg-amber-100 dark:bg-amber-900/50 rounded-xl flex items-center justify-center">
                     <flux:icon name="exclamation-triangle" variant="solid" class="size-6 text-amber-600 dark:text-amber-400" />
@@ -65,12 +65,12 @@
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <flux:subheading>This Month</flux:subheading>
+                    <flux:subheading>Bulan Ini</flux:subheading>
                     <flux:heading size="xl" class="mt-1">
                         {{ \Illuminate\Support\Number::currency($this->monthSales['total'], 'IDR') }}
                     </flux:heading>
                     <flux:subheading size="sm" class="mt-1">
-                        {{ $this->monthSales['count'] }} sales
+                        {{ $this->monthSales['count'] }} Penjualan
                     </flux:subheading>
                 </div>
                 <div class="size-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl flex items-center justify-center">
@@ -85,8 +85,8 @@
         {{-- Weekly Sales Chart --}}
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6">
             <div class="flex items-center justify-between mb-6">
-                <flux:heading size="lg">Weekly Sales</flux:heading>
-                <flux:badge size="sm" color="zinc">Last 7 days</flux:badge>
+                <flux:heading size="lg">Penjualan Mingguan</flux:heading>
+                <flux:badge size="sm" color="zinc">7 Hari Terakhir</flux:badge>
             </div>
             <div class="h-64"
                  x-data="{
@@ -126,7 +126,10 @@
                                         beginAtZero: true,
                                         grid: { color: 'rgba(0,0,0,0.05)' },
                                         ticks: {
-                                            callback: (value) => '$' + value.toLocaleString()
+                                            // 👇 TAMBAHAN: Paksa Chart.js untuk tidak membuat jarak desimal
+                                            precision: 0, 
+                                            // 👇 PERBAIKAN: Pastikan format Rp tidak ada buntut komanya
+                                            callback: (value) => 'Rp ' + value.toLocaleString('id-ID', { maximumFractionDigits: 0 })
                                         }
                                     },
                                     x: {
@@ -144,8 +147,8 @@
         {{-- Payment Methods Chart --}}
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6">
             <div class="flex items-center justify-between mb-6">
-                <flux:heading size="lg">Payment Methods</flux:heading>
-                <flux:badge size="sm" color="zinc">This Month</flux:badge>
+                <flux:heading size="lg">Metode Pembayaran</flux:heading>
+                <flux:badge size="sm" color="zinc">Bulan Ini</flux:badge>
             </div>
             <div class="h-64"
                  x-data="{
@@ -202,8 +205,8 @@
         {{-- Recent Sales --}}
         <div class="lg:col-span-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 overflow-hidden">
             <div class="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-                <flux:heading size="lg">Recent Sales</flux:heading>
-                <flux:badge color="zinc">Last 5</flux:badge>
+                <flux:heading size="lg">Penjualan Terbaru</flux:heading>
+                <flux:badge color="zinc">5 Terakhir</flux:badge>
             </div>
             <div class="divide-y divide-zinc-200 dark:divide-zinc-700">
                 @forelse($this->recentSales as $sale)
@@ -242,9 +245,9 @@
                 @empty
                     <div class="px-6 py-12 text-center">
                         <flux:icon name="shopping-bag" class="size-12 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
-                        <flux:subheading>No sales yet today</flux:subheading>
+                        <flux:subheading>Tidak ada penjualan hari ini</flux:subheading>
                         <flux:button href="{{ route('pos.index') }}" wire:navigate variant="primary" size="sm" class="mt-4">
-                            Make First Sale
+                            Buat Penjualan Pertama
                         </flux:button>
                     </div>
                 @endforelse
@@ -256,8 +259,8 @@
             {{-- Top Selling --}}
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 overflow-hidden">
                 <div class="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-                    <flux:heading size="lg">Top Selling</flux:heading>
-                    <flux:badge size="sm" color="indigo">This Month</flux:badge>
+                    <flux:heading size="lg">Penjualan Teratas</flux:heading>
+                    <flux:badge size="sm" color="indigo">Bulan Ini</flux:badge>
                 </div>
                 <div class="divide-y divide-zinc-200 dark:divide-zinc-700">
                     @forelse($this->topSellingItems() as $index => $item)
@@ -270,11 +273,11 @@
                                     {{ $item->name }}
                                 </span>
                             </div>
-                            <flux:subheading>{{ $item->total_sold }} sold</flux:subheading>
+                            <flux:subheading>{{ $item->total_sold }} terjual</flux:subheading>
                         </div>
                     @empty
                         <div class="px-6 py-8 text-center">
-                            <flux:subheading>No sales data yet</flux:subheading>
+                            <flux:subheading>Tidak ada data penjualan</flux:subheading>
                         </div>
                     @endforelse
                 </div>
@@ -283,7 +286,7 @@
             {{-- Low Stock Alert --}}
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 overflow-hidden">
                 <div class="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-                    <flux:heading size="lg">Low Stock Alert</flux:heading>
+                    <flux:heading size="lg">Peringatan Stok Rendah</flux:heading>
                     @if($this->lowStockItems > 0)
                         <flux:badge size="sm" color="amber">{{ $this->lowStockItems }}</flux:badge>
                     @else
@@ -304,13 +307,13 @@
                                 };
                             @endphp
                             <flux:badge size="sm" :color="$stockColor">
-                                {{ $inventory['quantity'] }} left
+                                {{ $inventory['quantity'] }} tersisa
                             </flux:badge>
                         </div>
                     @empty
                         <div class="px-6 py-8 text-center">
                             <flux:icon name="check-circle" class="size-8 text-emerald-500 mx-auto mb-2" />
-                            <flux:subheading>All items well stocked</flux:subheading>
+                            <flux:subheading>Semua item terstok dengan baik</flux:subheading>
                         </div>
                     @endforelse
                 </div>

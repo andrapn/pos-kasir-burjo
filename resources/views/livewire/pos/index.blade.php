@@ -104,8 +104,8 @@
                         <div class="size-24 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center mb-4">
                             <flux:icon name="magnifying-glass" class="size-12 text-zinc-400" />
                         </div>
-                        <p class="text-zinc-600 dark:text-zinc-400 font-medium text-lg">No products found</p>
-                        <p class="text-zinc-400 dark:text-zinc-500 text-sm mt-1">Try a different search term</p>
+                        <p class="text-zinc-600 dark:text-zinc-400 font-medium text-lg">Produk Tidak Ditemukan</p>
+                        <p class="text-zinc-400 dark:text-zinc-500 text-sm mt-1">Coba istilah pencarian yang berbeda</p>
                     </div>
                 @endforelse
             </div>
@@ -116,17 +116,17 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <flux:button size="sm" variant="ghost" icon="arrow-path">Refresh</flux:button>
-                    <flux:button size="sm" variant="ghost" icon="clock">Recent</flux:button>
+                    <flux:button size="sm" variant="ghost" icon="clock">Terkini</flux:button>
                 </div>
                 <div class="flex items-center gap-2 text-xs text-zinc-500">
                     <span class="flex items-center gap-1">
-                        <span class="size-2 rounded-full bg-emerald-500"></span> In Stock
+                        <span class="size-2 rounded-full bg-emerald-500"></span> Stok Tersedia
                     </span>
                     <span class="flex items-center gap-1">
-                        <span class="size-2 rounded-full bg-amber-500"></span> Low
+                        <span class="size-2 rounded-full bg-amber-500"></span> Rendah
                     </span>
                     <span class="flex items-center gap-1">
-                        <span class="size-2 rounded-full bg-red-500"></span> Critical
+                        <span class="size-2 rounded-full bg-red-500"></span> Kritis
                     </span>
                 </div>
             </div>
@@ -143,8 +143,8 @@
                         <flux:icon name="shopping-cart" class="size-5 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <div>
-                        <h2 class="font-bold text-zinc-900 dark:text-white">Current Order</h2>
-                        <p class="text-xs text-zinc-500">{{ count($this->cart) }} items</p>
+                        <h2 class="font-bold text-zinc-900 dark:text-white">Pesanan Saat Ini</h2>
+                        <p class="text-xs text-zinc-500">{{ count($this->cart) }} item</p>
                     </div>
                 </div>
                 
@@ -153,13 +153,21 @@
                     @if(count(session('held_orders', [])) > 0)
                         <flux:dropdown position="bottom" align="end">
                             <flux:button size="sm" variant="filled" color="amber" icon="clock">
-                                {{ count(session('held_orders', [])) }} Held
+                                {{ count(session('held_orders', [])) }} Ditahan
                             </flux:button>
                             <flux:menu class="w-72">
-                                <flux:menu.heading>Held Orders</flux:menu.heading>
+                                <flux:menu.heading>Pesanan Ditahan</flux:menu.heading>
                                 @foreach(session('held_orders', []) as $index => $heldOrder)
                                     <flux:menu.item wire:click="restoreOrder({{ $index }})" icon="arrow-uturn-left">
-                                        Hold #{{ $index + 1 }} ({{ $heldOrder['time'] }}) - {{ \Illuminate\Support\Number::currency($heldOrder['total'], 'IDR') }}
+                                        {{-- Tampilkan Nama Pelanggan dengan Jelas --}}
+                                        <div class="flex flex-col">
+                                            <span class="font-semibold text-zinc-900 dark:text-white">
+                                                {{ $heldOrder['customer_name'] ?? 'Unknown' }}
+                                            </span>
+                                            <span class="text-[11px] text-zinc-500">
+                                                Jam {{ $heldOrder['time'] }} - {{ \Illuminate\Support\Number::currency($heldOrder['total'], 'IDR') }}
+                                            </span>
+                                        </div>
                                     </flux:menu.item>
                                 @endforeach
                             </flux:menu>
@@ -169,7 +177,7 @@
                     {{-- Tombol Clear --}}
                     @if(count($this->cart) > 0)
                         <flux:button wire:click="clearCart" size="sm" variant="ghost" icon="trash" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
-                            Clear
+                            Hapus
                         </flux:button>
                     @endif
                 </div>
@@ -239,8 +247,8 @@
                     <div class="size-20 bg-zinc-100 dark:bg-zinc-700 rounded-2xl flex items-center justify-center mb-4">
                         <flux:icon name="shopping-bag" class="size-10 text-zinc-300 dark:text-zinc-500" />
                     </div>
-                    <p class="font-medium text-zinc-600 dark:text-zinc-400">No items yet</p>
-                    <p class="text-sm text-zinc-400 dark:text-zinc-500 mt-1">Click products to add them</p>
+                    <p class="font-medium text-zinc-600 dark:text-zinc-400">Tidak ada Item</p>
+                    <p class="text-sm text-zinc-400 dark:text-zinc-500 mt-1">Klik Produk untuk menambahkan ke keranjang</p>
                 </div>
             @endforelse
         </div>
@@ -305,7 +313,7 @@
                                      flex items-center justify-center">
                             <flux:icon name="user" class="size-3 text-zinc-500" />
                         </span>
-                                    <span class="text-zinc-600 dark:text-zinc-400">Walk-in Customer</span>
+                                    <span class="text-zinc-600 dark:text-zinc-400">Customer X</span>
                                 </button>
 
                                 @forelse($this->filteredCustomers as $customer)
@@ -336,7 +344,7 @@
                                     </button>
                                 @empty
                                     @if($customerSearch)
-                                        <p class="px-3 py-4 text-sm text-zinc-500 text-center">No customers found</p>
+                                        <p class="px-3 py-4 text-sm text-zinc-500 text-center">Pelanggan Tidak Ditemukan</p>
                                     @endif
                                 @endforelse
                             </div>
@@ -367,7 +375,7 @@
                                     <span class="text-zinc-900 dark:text-white">{{ $selectedMethod?->name }}</span>
                                 @else
                                     <flux:icon name="credit-card" class="size-4 text-zinc-400" />
-                                    <span class="text-zinc-400">Payment Method</span>
+                                    <span class="text-zinc-400">Metode Pembayaran</span>
                                 @endif
                             </div>
                             <flux:icon name="chevron-down" class="size-4 text-zinc-400" />
@@ -454,7 +462,7 @@
                        dark:hover:border-red-500 dark:hover:text-red-400 transition-colors"
                             >
                                 <flux:icon name="tag" class="size-4" />
-                                <span class="text-sm font-medium">Add Discount</span>
+                                <span class="text-sm font-medium">Tambahkan Diskon</span>
                             </button>
                         </template>
 
@@ -467,7 +475,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <label class="text-[10px] uppercase tracking-wider text-red-500 font-semibold">
-                                        Discount Applied
+                                        Diskon Diterapkan
                                     </label>
                                     <div class="flex items-center">
                                         <span class="text-red-500 text-xl font-bold mr-1">-IDR</span>
@@ -508,7 +516,7 @@
             {{-- Payment Amount --}}
             <div class="px-4 pb-4">
                 <div class="bg-white dark:bg-zinc-700 rounded-xl p-3 mb-3">
-                    <label class="text-xs text-zinc-500 dark:text-zinc-400 block mb-1">Amount Received</label>
+                    <label class="text-xs text-zinc-500 dark:text-zinc-400 block mb-1">Jumlah Diterima</label>
                     <div class="flex items-center">
                         <span class="text-xl text-zinc-400 mr-2">IDR</span>
                         <input
@@ -544,7 +552,7 @@
                         class="justify-center"
                         :disabled="count($this->cart) === 0"
                     >
-                        Hold Order
+                        Simpan Pesanan
                     </flux:button>
                     <flux:button
                         wire:click="checkout"
@@ -553,7 +561,7 @@
                         class="justify-center bg-indigo-600 hover:bg-indigo-700"
                         :disabled="count($this->cart) === 0 || !$this->paymentMethodId"
                     >
-                        Pay Now
+                        Bayar Sekarang
                     </flux:button>
                 </div>
             </div>

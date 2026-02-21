@@ -6,13 +6,13 @@
             <div>
                 <flux:heading size="xl">{{ $record->name }}</flux:heading>
                 <flux:text class="mt-1">
-                    Customer since {{ $record->created_at->format('M d, Y') }}
+                    Pelanggan Sejak {{ $record->created_at->format('M d, Y') }}
                 </flux:text>
             </div>
         </div>
         <div class="flex items-center gap-3">
             <flux:button wire:navigate href="{{ route('customers.edit', $record) }}" variant="primary" icon="pencil-square">
-                Edit Customer
+                Edit Pelanggan
             </flux:button>
         </div>
     </div>
@@ -27,14 +27,14 @@
 
     <div class="flex items-center justify-between">
         <flux:button wire:navigate href="{{ route('customers.index') }}" variant="ghost" icon="arrow-left">
-            Back to Customers
+            Kembali ke Pelanggan
         </flux:button>
         <div class="flex items-center gap-3">
             <flux:button wire:navigate  href="{{ route('customers.edit', $record) }}" variant="filled" icon="pencil-square">
                 Edit
             </flux:button>
             <flux:button variant="danger" icon="trash" wire:navigate wire:click="delete" wire:confirm="Are you sure you want to delete this customer?">
-                Delete
+                Hapus
             </flux:button>
         </div>
     </div>

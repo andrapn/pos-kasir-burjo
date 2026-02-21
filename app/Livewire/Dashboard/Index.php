@@ -96,18 +96,18 @@ final class Index extends Component
             ->get();
     }
 
-    public function topSellingItems(): SupportCollection
+    public function topSellingItems(): \Illuminate\Support\Collection
     {
         return DB::table('sales_items')
             ->join('items', 'sales_items.item_id', 'items.id')
             ->select(
-                // COALESCE: Kalau item_name kosong (transaksi jadul), pakai nama dari tabel items. 
-                // Kalau ada (transaksi baru yg pakai varian), pakai dari sales_items.
                 DB::raw('COALESCE(sales_items.item_name, items.name) as name'), 
                 DB::raw('SUM(sales_items.quantity) as total_sold')
             )
             ->whereMonth('sales_items.created_at', now()->month)
-            ->groupBy('name') // Kelompokkan berdasarkan nama varian yang unik
+            // 👇 FIX UNTUK POSTGRESQL 👇
+            // Kita pakai groupByRaw dan jabarkan fungsinya secara utuh
+            ->groupByRaw('COALESCE(sales_items.item_name, items.name)') 
             ->orderByDesc('total_sold')
             ->take(5)
             ->get();
@@ -152,9 +152,21 @@ final class Index extends Component
     {
         $days = collect(range(6, 0))->map(function ($daysAgo): array {
             $date = now()->subDays($daysAgo);
+            
+            // Bikin kamus translate hari
+            $namaHari = [
+                'Sun' => 'Min',
+                'Mon' => 'Sen',
+                'Tue' => 'Sel',
+                'Wed' => 'Rab',
+                'Thu' => 'Kam',
+                'Fri' => 'Jum',
+                'Sat' => 'Sab',
+            ];
 
             return [
-                'label' => $date->format('D'),
+                // Panggil kamusnya berdasarkan format 'D' (Sun, Mon, dst)
+                'label' => $namaHari[$date->format('D')], 
                 'date' => $date->toDateString(),
                 'total' => Sale::whereDate('created_at', $date)->sum('total'),
             ];

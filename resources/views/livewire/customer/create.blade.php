@@ -1,10 +1,10 @@
 <div class="max-w-4xl mx-auto">
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-            Create Customer
+            Buat Pelanggan Baru
         </h1>
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Add a new customer to your database
+            Tambahkan pelanggan baru ke database Anda
         </p>
     </div>
 
@@ -17,7 +17,7 @@
                 variant="ghost"
                 wire:click="cancel"
             >
-                Cancel
+                Batal
             </x-flux::button>
 
             <x-flux::button
@@ -25,7 +25,7 @@
                 variant="primary"
                 icon="check-badge"
             >
-                Create Customer
+                Buat Pelanggan
             </x-flux::button>
         </div>
     </form>

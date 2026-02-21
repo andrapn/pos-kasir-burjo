@@ -2,14 +2,10 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
+        <script>
+            localStorage.setItem('theme', 'light');
             document.documentElement.classList.remove('dark');
-        }
-    </script>
-    
+        </script>
     @include('partials.head')
     <style>
         [x-cloak] {
@@ -43,19 +39,19 @@
 
             @can('sales.create')
                 <flux:menu.item wire:navigate icon="shopping-cart" :href="route('pos.index')">
-                    {{ __('New Sale') }}
+                    {{ __('Penjualan Baru') }}
                 </flux:menu.item>
             @endcan
 
             @can('customers.create')
                 <flux:menu.item wire:navigate icon="user-plus" :href="route('customers.create')">
-                    {{ __('Add Customer') }}
+                    {{ __('Tambah Pelanggan') }}
                 </flux:menu.item>
             @endcan
 
             @can('items.create')
                 <flux:menu.item wire:navigate icon="plus-circle" :href="route('items.create')">
-                    {{ __('Add Item') }}
+                    {{ __('Tambah Item') }}
                 </flux:menu.item>
             @endcan
 
@@ -63,7 +59,7 @@
 
             @can('sales.view')
                 <flux:menu.item wire:navigate icon="chart-bar" :href="route('sales.index')">
-                    {{ __('View Sales') }}
+                    {{ __('Lihat Penjualan') }}
                 </flux:menu.item>
             @endcan
 
@@ -152,7 +148,7 @@
     @can('sales.create')
         <div class="px-3 my-4">
             <flux:button wire:navigate icon="shopping-bag" href="{{ route('pos.index') }}" variant="primary" class="w-full justify-center">
-                {{ __('New Sale') }}
+                {{ __('Penjualan Baru') }}
             </flux:button>
         </div>
     @endcan
@@ -193,7 +189,7 @@
                         :href="route('sales.index')"
                         :current="request()->routeIs('sales.index')"
                     >
-                        {{ __('Transactions') }}
+                        {{ __('Transaksi') }}
                     </flux:navlist.item>
                 @endcan
 
@@ -219,7 +215,7 @@
                         :href="route('items.index')"
                         :current="request()->routeIs('items.*')"
                     >
-                        {{ __('Products') }}
+                        {{ __('Produk') }}
                     </flux:navlist.item>
                 @endcan
                 @can('items.view')
@@ -229,7 +225,7 @@
                         :href="route('variants.index')"
                         :current="request()->routeIs('variants.*')"
                     >
-                        {{ __('Master Variants') }}
+                        {{ __('Grup Variasi') }}
                     </flux:navlist.item>
                 @endcan
                 @can('inventory.view')
@@ -239,7 +235,7 @@
                         :href="route('inventories')"
                         :current="request()->routeIs('inventories*')"
                     >
-                        {{ __('Stock Levels') }}
+                        {{ __('Level Stok') }}
                     </flux:navlist.item>
                 @endcan
             </flux:navlist.group>
@@ -254,7 +250,7 @@
                     :href="route('customers.index')"
                     :current="request()->routeIs('customers.index')"
                 >
-                    {{ __('All Customers') }}
+                    {{ __('Semua Pelanggan') }}
                 </flux:navlist.item>
 
                 @can('customers.create')
@@ -264,7 +260,7 @@
                         :href="route('customers.create')"
                         :current="request()->routeIs('customers.create')"
                     >
-                        {{ __('Add Customer') }}
+                        {{ __('Tambah Pelanggan') }}
                     </flux:navlist.item>
                 @endcan
             </flux:navlist.group>
@@ -280,7 +276,7 @@
                         :href="route('management.payment-methods')"
                         :current="request()->routeIs('management.payment-methods*')"
                     >
-                        {{ __('Payment Methods') }}
+                        {{ __('Metode Pembayaran') }}
                     </flux:navlist.item>
                 @endcan
 
@@ -306,7 +302,7 @@
                         :href="route('management.users')"
                         :current="request()->routeIs('management.users*')"
                     >
-                        {{ __('Users') }}
+                        {{ __('Pengguna') }}
                     </flux:navlist.item>
                 @endcan
 
@@ -317,7 +313,7 @@
                         :href="route('management.roles')"
                         :current="request()->routeIs('management.roles*')"
                     >
-                        {{ __('Roles & Permissions') }}
+                        {{ __('Peran & Izin') }}
                     </flux:navlist.item>
                 @endcan
             </flux:navlist.group>
@@ -326,7 +322,7 @@
         {{-- System --}}
         @canany(['backups.view', 'settings.view', 'authentication-logs.view'])
             <flux:navlist.group :heading="__('System')" expandable :expanded="request()->routeIs('backups.*', 'settings.*', 'management.authentication-logs*', 'notifications.*')">
-                @can('authentication-logs.view')
+                {{-- @can('authentication-logs.view')
                     <flux:navlist.item
                         wire:navigate
                         icon="finger-print"
@@ -335,7 +331,7 @@
                     >
                         {{ __('Auth Logs') }}
                     </flux:navlist.item>
-                @endcan
+                @endcan --}}
 
                 <flux:navlist.item
                     wire:navigate
@@ -343,7 +339,7 @@
                     :href="route('notifications.index')"
                     :current="request()->routeIs('notifications.*')"
                 >
-                    {{ __('Notifications') }}
+                    {{ __('Notifikasi') }}
                 </flux:navlist.item>
 
                 @can('backups.view')
@@ -367,13 +363,13 @@
                     </flux:navlist.item>
                 @endcan --}}
 
-                <flux:navlist.item
+                {{-- <flux:navlist.item
                     icon="document-text"
                     href="{{ url('log-viewer') }}"
                     target="_blank"
                 >
                     {{ __('Logs') }}
-                </flux:navlist.item>
+                </flux:navlist.item> --}}
             </flux:navlist.group>
         @endcanany
     </flux:navlist>
@@ -404,7 +400,7 @@
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
-                            {{ __('Log Out') }}
+                            {{ __('Keluar') }}
                         </flux:menu.item>
                     </form>
                 </flux:menu>
@@ -414,11 +410,11 @@
 
     {{-- Footer --}}
     <div class="border-t border-zinc-200 p-3 dark:border-zinc-700">
-        <a target="_blank" href="{{ url('https://github.com/fabyo0/pos-app/discussions') }}"
+        {{-- <a target="_blank" href="{{ url('https://github.com/fabyo0/pos-app/discussions') }}"
            class="flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">
             <flux:icon name="question-mark-circle" variant="outline" class="size-4"/>
             {{ __('Help & Support') }}
-        </a>
+        </a> --}}
 
         <p class="mt-3 text-[10px] text-zinc-400 dark:text-zinc-500">
             {{ config('app.name') }} v1.0.0 · © {{ date('Y') }}
