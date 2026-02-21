@@ -10,7 +10,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Repeater;
@@ -54,10 +54,10 @@ class VariantGroups extends Component implements HasForms, HasTable
             ]);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([ // <-- Ubah dari ->schema(...) jadi ->components(...)
                 TextInput::make('name')
                     ->label('Judul Varian')
                     ->placeholder('Cth: Rasa Nutrisari, Level Pedas')
@@ -73,7 +73,7 @@ class VariantGroups extends Component implements HasForms, HasTable
                             ->required(),
                     ])
                     ->columns(1)
-                    ->addActionLabel('Tambah Pilihan')
+                    ->addActionLabel('Tambah Pilihan'),
             ])
             ->statePath('data'); // Wajib ada untuk form custom
     }
