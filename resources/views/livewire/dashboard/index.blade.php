@@ -269,7 +269,7 @@
                                 <span class="size-6 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
                                     {{ $index + 1 }}
                                 </span>
-                                <span class="text-sm text-zinc-900 dark:text-white truncate max-w-[140px]">
+                                <span class="whitespace-normal break-words line-clamp-2 text-sm font-medium text-zinc-900 dark:text-white">
                                     {{ $item->name }}
                                 </span>
                             </div>
