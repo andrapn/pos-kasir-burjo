@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Inventory;
 use App\Models\Item;
 use App\Models\Sale;
+use App\Models\VariantOption;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -108,12 +109,37 @@ final class Index extends Component
     }
 
     #[Computed]
-    public function lowStockList(): Collection
+    public function lowStockList(): array
     {
-        return Inventory::with('item:id,name')
-            ->where('quantity', '<=', 10)
-            ->orderBy('quantity')
-            ->get();
+        return Inventory::with('item:id,name,low_stock_threshold') // Ambil relasi item sekalian
+            ->get()
+            ->filter(function ($inventory) {
+                // Saring jika stok <= batas minimum dari item induk (default 10 kalau kosong)
+                $threshold = $inventory->item->low_stock_threshold ?? 10;
+                return $inventory->quantity <= $threshold && $inventory->quantity > 0;
+            })
+            ->map(function ($inventory) {
+                // Format nama biar variannya ikutan mejeng
+                $name = ucfirst((string) $inventory->item->name);
+                
+                if ($inventory->variant_option_id) {
+                    $variant = VariantOption::find($inventory->variant_option_id);
+                    if ($variant) {
+                        $name .= ' (' . $variant->name . ')';
+                    }
+                }
+
+                return [
+                    'id' => $inventory->id, // Bawa ID buat jaga-jaga kalau dibutuhin di blade
+                    'item' => [
+                        'name' => $name, // Nama yang udah digabung sama varian
+                    ],
+                    'quantity' => $inventory->quantity,
+                ];
+            })
+            ->sortBy('quantity') // Urutkan dari stok yang paling kritis
+            ->values()
+            ->toArray();
     }
 
     #[Computed]

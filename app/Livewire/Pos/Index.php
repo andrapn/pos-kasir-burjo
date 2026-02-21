@@ -64,20 +64,22 @@ final class Index extends Component implements HasActions, HasSchemas
 
     public function mount(): void
     {
-        $this->items = Item::with('inventory')
-            ->withWhereHas(relation: 'inventory', callback: function ($query): void {
-                $query->where('quantity', '>', 0);
-            })
+        // Ambil item beserta semua baris inventory-nya
+        $this->items = Item::with('inventories')
             ->active()
             ->latest()
             ->get()
+            // Saring: Hanya tampilkan item yang TOTAL stoknya > 0
+            ->filter(fn(Item $item) => $item->inventories->sum('quantity') > 0)
             ->map(fn(Item $item): array => [
                 'id' => $item->id,
                 'name' => $item->name,
-                'category' => $item->category ?? 'Makanan', // Tambahkan ini pengganti SKU
+                'category' => $item->category ?? 'Makanan', 
                 'price' => $item->price,
-                'stock' => $item->inventory->quantity,
+                // Jumlahkan semua stok variannya di sini!
+                'stock' => $item->inventories->sum('quantity'), 
             ])
+            ->values() // WAJIB ADA: Biar index array-nya keriset (nggak bolong-bolong akibat proses filter)
             ->toArray();
 
         $this->customers = Customer::all();
@@ -479,15 +481,17 @@ final class Index extends Component implements HasActions, HasSchemas
                                 ->decrement('quantity', $item['quantity']);
                         }
                     } elseif (!empty($item['variant_id'])) {
-                        // Jika varian tunggal
+                        // Jika varian tunggal lama
                         Inventory::where('item_id', $item['id'])
                             ->where('variant_option_id', $item['variant_id'])
                             ->decrement('quantity', $item['quantity']);
                     } else {
-                        // Jika produk reguler tanpa varian
-                        Inventory::where('item_id', $item['id'])
-                            ->whereNull('variant_option_id')
-                            ->decrement('quantity', $item['quantity']);
+                        // JIKA PRODUK REGULER (TANPA VARIAN)
+                        // Pakai first() agar dijamin langsung ngurangin 1 baris stok utama yang ada
+                        $inventory = Inventory::where('item_id', $item['id'])->first();
+                        if ($inventory) {
+                            $inventory->decrement('quantity', $item['quantity']);
+                        }
                     }
                 }
             });
