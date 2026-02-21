@@ -14,13 +14,16 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Repeater;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Livewire\Component;
 use Illuminate\Contracts\View\View;
 
-class VariantGroups extends Component implements HasForms, HasTable
+class VariantGroups extends Component implements HasForms, HasTable, HasActions
 {
     use InteractsWithForms;
     use InteractsWithTable;
+    use InteractsWithActions;
 
     public ?array $data = [];
     public $editingId = null;
