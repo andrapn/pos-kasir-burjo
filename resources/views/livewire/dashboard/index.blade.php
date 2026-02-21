@@ -298,8 +298,8 @@
                             </span>
                             @php
                                 $stockColor = match(true) {
-                                    $inventory->quantity <= 0 => 'red',
-                                    $inventory->quantity <= 5 => 'amber',
+                                    $inventory['quantity'] <= 0 => 'red',
+                                    $inventory['quantity'] <= 5 => 'amber',
                                     default => 'zinc'
                                 };
                             @endphp
