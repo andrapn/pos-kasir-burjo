@@ -156,7 +156,7 @@
     <flux:navlist variant="outline">
         {{-- Overview --}}
         @can('dashboard.view')
-            <flux:navlist.group :heading="__('Overview')" expandable :expanded="request()->routeIs('dashboard')">
+            <flux:navlist.group :heading="__('Utama')" expandable :expanded="request()->routeIs('dashboard')">
                 <flux:navlist.item
                     wire:navigate
                     icon="home"
@@ -170,7 +170,7 @@
 
         {{-- Sales & Orders --}}
         @canany(['sales.view', 'sales.create'])
-            <flux:navlist.group :heading="__('Sales')" expandable :expanded="request()->routeIs('sales.*', 'pos.*')">
+            <flux:navlist.group :heading="__('Penjualan')" expandable :expanded="request()->routeIs('sales.*', 'pos.*')">
                 @can('sales.create')
                     <flux:navlist.item
                         wire:navigate
@@ -207,7 +207,7 @@
 
         {{-- Inventory --}}
         @canany(['items.view', 'inventory.view'])
-            <flux:navlist.group :heading="__('Inventory')" expandable :expanded="request()->routeIs('items.*', 'inventories*')">
+            <flux:navlist.group :heading="__('Inventaris')" expandable :expanded="request()->routeIs('items.*', 'inventories*')">
                 @can('items.view')
                     <flux:navlist.item
                         wire:navigate
@@ -243,7 +243,7 @@
 
         {{-- Customers --}}
         @can('customers.view')
-            <flux:navlist.group :heading="__('Customers')" expandable :expanded="request()->routeIs('customers.*')">
+            <flux:navlist.group :heading="__('Pelanggan')" expandable :expanded="request()->routeIs('customers.*')">
                 <flux:navlist.item
                     wire:navigate
                     icon="users"
@@ -268,7 +268,7 @@
 
         {{-- Finance --}}
         @canany(['payment-methods.view', 'sales.export'])
-            <flux:navlist.group :heading="__('Finance')" expandable :expanded="request()->routeIs('management.payment-methods*')">
+            <flux:navlist.group :heading="__('Keuangan')" expandable :expanded="request()->routeIs('management.payment-methods*')">
                 @can('payment-methods.view')
                     <flux:navlist.item
                         wire:navigate
@@ -321,7 +321,7 @@
 
         {{-- System --}}
         @canany(['backups.view', 'settings.view', 'authentication-logs.view'])
-            <flux:navlist.group :heading="__('System')" expandable :expanded="request()->routeIs('backups.*', 'settings.*', 'management.authentication-logs*', 'notifications.*')">
+            <flux:navlist.group :heading="__('Sistem')" expandable :expanded="request()->routeIs('backups.*', 'settings.*', 'management.authentication-logs*', 'notifications.*')">
                 {{-- @can('authentication-logs.view')
                     <flux:navlist.item
                         wire:navigate

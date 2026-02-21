@@ -81,17 +81,20 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
             ->statePath('data'); // Wajib ada untuk form custom
     }
 
-    public function openCreate()
+    public function openCreate(): void
     {
         $this->form->fill();
         $this->editingId = null;
+        
+        // 👇 TAMBAHKAN BARIS INI
+        $this->dispatch('open-variant-modal'); 
     }
 
-    public function openEdit($id)
+    public function openEdit($id): void
     {
         $this->editingId = $id;
         $group = VariantGroup::with('options')->find($id);
-        
+
         if ($group) {
             $this->form->fill([
                 'name' => $group->name,
@@ -99,6 +102,9 @@ class VariantGroups extends Component implements HasForms, HasTable, HasActions
                 'options' => $group->options->toArray(),
             ]);
         }
+        
+        // 👇 TAMBAHKAN BARIS INI JUGA
+        $this->dispatch('open-variant-modal'); 
     }
 
     public function delete($id)

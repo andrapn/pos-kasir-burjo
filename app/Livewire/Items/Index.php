@@ -46,8 +46,10 @@ final class Index extends Component implements HasActions, HasSchemas, HasTable
                     ->searchable(),
                 TextColumn::make('variantGroups.name')
                     ->label('Group Varian')
-                    ->badge() // Biar tampilannya kotak-kotak rapi
+                    ->badge() 
                     ->separator(', ')
+                    ->limitList(5)
+                    ->expandableLimitedList()
                     ->searchable(),
                 TextColumn::make('price')
                     ->label('Price')

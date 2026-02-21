@@ -26,7 +26,10 @@
     </div>
 
     {{-- MODAL CUSTOM MURNI FLUX --}}
-    <flux:modal name="variant-modal" class="md:w-[600px]" x-on:close-variant-modal.window="$flux.modal('variant-modal').close()">
+    <flux:modal name="variant-modal" class="md:w-[600px]" 
+        x-on:close-variant-modal.window="$flux.modal('variant-modal').close()"
+        x-on:open-variant-modal.window="$flux.modal('variant-modal').show()"
+    >
         <form wire:submit="save" class="space-y-6">
             <flux:heading size="lg">{{ $editingId ? 'Edit Varian' : 'Tambah Varian' }}</flux:heading>
             
